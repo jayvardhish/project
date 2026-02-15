@@ -23,6 +23,21 @@ dist-ssr
 *.sln
 *.sw?
 
+
+
+# Environment files
 .env
-backend/.env
+**/.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Uploads
+backend/uploads/
+
+# Node
 node_modules/
+
+# Build
+dist/
