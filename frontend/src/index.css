@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #7C3AED;
+  --color-primary-light: #A78BFA;
+  --color-secondary: #E9D5FF;
+  --color-accent: #1F2937;
+  --color-bg-white: #FFFFFF;
+
+  --font-heading: "Inter", sans-serif;
+  --font-body: "Roboto", sans-serif;
+
+  --background-gradient: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+}
+
+@layer base {
+  body {
+    @apply font-body bg-white text-accent;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-bold;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-2 rounded-lg font-semibold transition-all hover:bg-primary/90 active:scale-95;
+  }
+
+  .glass-card {
+    @apply bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl p-6 shadow-xl;
+  }
+
+  .purple-gradient {
+    background: var(--background-gradient);
+  }
+}
+
+:root {
+  --foreground-rgb: 31, 41, 55;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 243, 244, 246;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
