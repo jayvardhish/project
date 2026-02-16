@@ -23,11 +23,11 @@ services:
   - type: web
     name: smart-learning-frontend
     env: static
-    buildCommand: cd frontend && npm install && npm run build
+    buildCommand: cd frontend && npm install && VITE_API_URL=https://$BACKEND_HOST npm run build
     staticPublishPath: frontend/dist
     envVars:
-      - key: VITE_API_URL
+      - key: BACKEND_HOST
         fromService:
           type: web
           name: smart-learning-backend
-          property: url
+          property: host
