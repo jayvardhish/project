@@ -38,38 +38,68 @@
    - `DEEPSEEK_API_KEY`: Your DeepSeek/OpenRouter API key
    - `CLIENT_URL`: Your frontend URL (e.g., `https://your-frontend.onrender.com`)
 
-   For the **frontend service**, set:
-   - `VITE_API_URL`: Your backend URL (e.g., `https://your-backend.onrender.com`)
+   For the **frontend service**, the configuration in `render.yaml` will automatically set:
+   - `BACKEND_HOST`: The hostname of your backend service
+   - `VITE_API_URL`: Constructed automatically during build (`https://$BACKEND_HOST`)
 
 4. **Deploy**
    - Click "Apply" to deploy both services
    - Wait for builds to complete (5-10 minutes)
 
-### Option 2: Manual Setup
+### Option 2: Manual Setup (Separate Services)
 
-#### Backend Setup
+If you prefer to deploy the backend and frontend as completely separate services (alag-alag) without using the `render.yaml` blueprint, follow these steps:
 
-1. **Create Web Service**
-   - New → Web Service
-   - Connect your repository
-   - Name: `smartlearn-backend`
-   - Runtime: Python 3
-   - Build Command: `pip install -r backend/requirements.txt`
-   - Start Command: `cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT`
+#### Step 1: Deploy Backend
 
-2. **Add Environment Variables** (same as above)
+1.  **Create Web Service**
+    - Click "New" → "Web Service"
+    - Connect your GitHub repository
+    - **Name**: `smartlearn-backend`
+    - **Root Directory**: `backend` (Important: Set this to depend only on backend files)
+    - **Runtime**: Python 3
+    - **Build Command**: `pip install -r requirements.txt` (Note: path is relative to Root Directory)
+    - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+    - **Region**: Select your preferred region (e.g., Singapore)
 
-#### Frontend Setup
+2.  **Add Environment Variables** (in the "Environment" tab)
+    - `PYTHON_VERSION`: `3.10.0`
+    - `MONGODB_URI`: Your MongoDB connection string
+    - `SECRET_KEY`: (Generate a random string)
+    - `OPENAI_API_KEY`: Your OpenAI API Key
+    - `DEEPSEEK_API_KEY`: Your DeepSeek API Key
+    - `CLIENT_URL`: `https://your-frontend-name.onrender.com` (You will update this *after* deploying frontend)
 
-1. **Create Static Site**
-   - New → Static Site
-   - Connect your repository
-   - Name: `smartlearn-frontend`
-   - Build Command: `cd frontend && npm install && npm run build`
-   - Publish Directory: `frontend/dist`
+3.  **Deploy Backend**
+    - Click "Create Web Service".
+    - Wait for deployment to finish.
+    - **Copy the Backend URL** (e.g., `https://smartlearn-backend.onrender.com`).
 
-2. **Add Environment Variable**
-   - `VITE_API_URL`: Your backend URL
+#### Step 2: Deploy Frontend
+
+1.  **Create Static Site**
+    - Click "New" → "Static Site"
+    - Connect the **SAME** GitHub repository
+    - **Name**: `smartlearn-frontend`
+    - **Root Directory**: `frontend` (Important: Set this to depend only on frontend files)
+    - **Build Command**: `npm install && npm run build`
+    - **Publish Directory**: `dist` (Relative to Root Directory, so just `dist`)
+
+2.  **Add Environment Variables**
+    - `VITE_API_URL`: Paste the **Backend URL** from Step 1 (e.g., `https://smartlearn-backend.onrender.com`)
+
+3.  **Deploy Frontend**
+    - Click "Create Static Site".
+    - Wait for deployment.
+    - **Copy the Frontend URL** (e.g., `https://smartlearn-frontend.onrender.com`).
+
+#### Step 3: Link Them
+
+1.  Go back to your **Backend Service** dashboard.
+2.  Go to "Environment".
+3.  Update `CLIENT_URL` to your actual **Frontend URL**.
+4.  Go to "Settings" -> "General" -> Scroll down to "CORS" (if applicable) or just ensure your code uses `CLIENT_URL` for CORS (which it does).
+5.  **Redeploy** the Backend (Manual Deploy -> Clear Cache & Deploy) to ensure it picks up the new `CLIENT_URL`.
 
 ## Post-Deployment Configuration
 
