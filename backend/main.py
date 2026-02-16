@@ -27,6 +27,11 @@ origins = [
     "http://127.0.0.1:5173",
 ]
 
+# Add production frontend URL if set
+production_url = os.getenv("PRODUCTION_CLIENT_URL")
+if production_url:
+    origins.append(production_url)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

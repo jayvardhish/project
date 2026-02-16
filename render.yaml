@@ -1,0 +1,33 @@
+services:
+  # Backend Service
+  - type: web
+    name: smart-learning-backend
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: MONGODB_URI
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+
+  # Frontend Service
+  - type: static
+    name: smart-learning-frontend
+    env: node
+    buildCommand: cd frontend && npm install && npm run build
+    publishDir: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: smart-learning-backend
+          property: url

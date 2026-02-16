@@ -4,6 +4,7 @@ import os
 import uuid
 from datetime import datetime
 from database import get_database
+from bson import ObjectId
 from routers.auth import get_current_user
 from models import UserResponse
 from ai_client import client

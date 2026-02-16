@@ -12,6 +12,7 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
 const MathSolver = () => {
+    console.log("MathSolver component initializing...");
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [expression, setExpression] = useState("");
@@ -21,6 +22,7 @@ const MathSolver = () => {
     const [activeInput, setActiveInput] = useState('text'); // 'text' or 'image'
 
     useEffect(() => {
+        console.log("MathSolver: Fetching history...");
         fetchHistory();
     }, []);
 
@@ -132,8 +134,8 @@ const MathSolver = () => {
                             whileHover={{ x: 4 }}
                             onClick={() => setSelectedItem(item)}
                             className={`w-full text-left p-4 rounded-2xl transition-all border flex items-center justify-between group ${selectedItem?._id === item._id
-                                    ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10'
-                                    : 'bg-white border-gray-50 hover:border-gray-200'
+                                ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10'
+                                : 'bg-white border-gray-50 hover:border-gray-200'
                                 }`}
                         >
                             <div className="min-w-0 pr-4">
@@ -350,14 +352,20 @@ const MathSolver = () => {
                                             <div className="h-0.5 flex-1 bg-gray-100" />
                                         </div>
 
-                                        <div className="prose prose-lg prose-slate max-w-none selection:bg-secondary">
-                                            <ReactMarkdown
-                                                remarkPlugins={[remarkMath]}
-                                                rehypePlugins={[rehypeKatex]}
-                                                className="math-markdown"
-                                            >
-                                                {selectedItem.solution}
-                                            </ReactMarkdown>
+                                        <div className="prose prose-lg prose-slate max-w-none selection:bg-secondary min-h-[400px]">
+                                            <div className="math-container">
+                                                <ReactMarkdown
+                                                    remarkPlugins={[remarkMath]}
+                                                    rehypePlugins={[rehypeKatex]}
+                                                    className="math-markdown"
+                                                    components={{
+                                                        p: ({ children }) => <p className="mb-4 leading-relaxed text-gray-700">{children}</p>,
+                                                        li: ({ children }) => <li className="mb-2 text-gray-700">{children}</li>
+                                                    }}
+                                                >
+                                                    {selectedItem.solution}
+                                                </ReactMarkdown>
+                                            </div>
                                         </div>
                                     </div>
 

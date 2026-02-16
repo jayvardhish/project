@@ -2,86 +2,72 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import VideoSummarizer from './pages/VideoSummarizer';
-import QuizGenerator from './pages/QuizGenerator';
-import HandwritingRecognition from './pages/HandwritingRecognition';
-import MathSolver from './pages/MathSolver';
-import EssayGrader from './pages/EssayGrader';
-import VirtualTutor from './pages/VirtualTutor';
-import PlagiarismChecker from './pages/PlagiarismChecker';
-import LearningPath from './pages/LearningPath';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import { Video, BookOpen, MessageSquare, PenTool, Calculator, MessageCircle, FileText, Layers, Bot, ShieldAlert, Map } from 'lucide-react';
+import { Video, BookOpen, MessageSquare, PenTool, Calculator, FileText, Bot, ShieldAlert, Map, LayoutDashboard, LogOut, User as UserIcon, Zap } from 'lucide-react';
+
+// Lazy Load Pages for Performance
+const Home = React.lazy(() => import('./pages/Home'));
+const Login = React.lazy(() => import('./pages/Login'));
+const Signup = React.lazy(() => import('./pages/Signup'));
+const VideoSummarizer = React.lazy(() => import('./pages/VideoSummarizer'));
+const QuizGenerator = React.lazy(() => import('./pages/QuizGenerator'));
+const HandwritingRecognition = React.lazy(() => import('./pages/HandwritingRecognition'));
+const MathSolver = React.lazy(() => import('./pages/MathSolver'));
+const EssayGrader = React.lazy(() => import('./pages/EssayGrader'));
+const VirtualTutor = React.lazy(() => import('./pages/VirtualTutor'));
+const PlagiarismChecker = React.lazy(() => import('./pages/PlagiarismChecker'));
+const LearningPath = React.lazy(() => import('./pages/LearningPath'));
+const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = React.lazy(() => import('./pages/ResetPassword'));
+const About = React.lazy(() => import('./pages/About'));
+
+// Loading Screen Component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="flex flex-col items-center">
+      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p className="font-bold text-gray-400 text-sm tracking-widest uppercase">Loading Resource...</p>
+    </div>
+  </div>
+);
 
 // Basic components (to be created)
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold text-accent">Welcome, {user?.username}!</h1>
-      <p className="mt-4 text-gray-600">You are successfully logged in to your SmartLearn dashboard.</p>
+    <div className="p-10 lg:p-16">
+      <div className="mb-12">
+        <div className="glass-pill mb-4 w-fit">Academic Command Center</div>
+        <h1 className="text-5xl lg:text-6xl font-black text-accent tracking-tighter leading-none">
+          Welcome, <span className="text-primary italic">{user?.username}!</span>
+        </h1>
+        <p className="mt-6 text-xl text-gray-400 font-medium max-w-2xl">
+          Your multimodal learning engines are primed and ready. What will you master today?
+        </p>
+      </div>
 
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Link to="/features/video-summarizer" className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-          <div className="w-12 h-12 bg-secondary/30 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-            <Video className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Video Summarizer</h3>
-          <p className="text-gray-500">Transcribe and summarize your lecture videos into key points.</p>
-        </Link>
-        <Link to="/features/quiz-generator" className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-          <div className="w-12 h-12 bg-secondary/30 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-            <BookOpen className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Quiz Generator</h3>
-          <p className="text-gray-500">Transform any document or text into an interactive quiz.</p>
-        </Link>
-        <Link to="/features/handwriting-recognition" className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-          <div className="w-12 h-12 bg-secondary/30 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-            <PenTool className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Handwriting OCR</h3>
-          <p className="text-gray-500">Convert handwritten notes into digital, editable text.</p>
-        </Link>
-        <Link to="/features/math-solver" className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-          <div className="w-12 h-12 bg-secondary/30 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-            <Calculator className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Math Solver</h3>
-          <p className="text-gray-500">Get step-by-step solutions for photographed math problems.</p>
-        </Link>
-        <Link to="/features/essay-grader" className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-          <div className="w-12 h-12 bg-secondary/30 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-            <FileText className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Essay Grader</h3>
-          <p className="text-gray-500">Get clinical AI feedback and academic scores for your essays.</p>
-        </Link>
-        <Link to="/features/virtual-tutor" className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-          <div className="w-12 h-12 bg-secondary/30 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-            <Bot className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Virtual Tutor</h3>
-          <p className="text-gray-500">24/7 real-time assistance with your academic questions.</p>
-        </Link>
-        <Link to="/features/plagiarism-checker" className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-          <div className="w-12 h-12 bg-secondary/30 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-            <ShieldAlert className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Plagiarism Checker</h3>
-          <p className="text-gray-500">Scan for duplication and analyze content for AI generation.</p>
-        </Link>
-        <Link to="/features/learning-path" className="p-8 bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-          <div className="w-12 h-12 bg-secondary/30 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-            <Map className="w-6 h-6" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Learning Path</h3>
-          <p className="text-gray-500">Get a personalized AI-generated roadmap for your studies.</p>
-        </Link>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {[
+          { to: "/features/video-summarizer", icon: <Video />, title: "Video Summarizer", desc: "Transcribe and extract key insights from lectures." },
+          { to: "/features/quiz-generator", icon: <BookOpen />, title: "Quiz Generator", desc: "Generate smart assessments from any document." },
+          { to: "/features/handwriting-recognition", icon: <PenTool />, title: "Handwriting OCR", desc: "Digitize your handwritten notes with 4K precision." },
+          { to: "/features/math-solver", icon: <Calculator />, title: "Math Solver", desc: "Step-by-step LaTeX solutions for equations." },
+          { to: "/features/essay-grader", icon: <FileText />, title: "Essay Grader", desc: "Deep semantic feedback and structural scoring." },
+          { to: "/features/virtual-tutor", icon: <Bot />, title: "Virtual Tutor", desc: "24/7 world-class academic assistance." },
+          { to: "/features/plagiarism-checker", icon: <ShieldAlert />, title: "Integrity Scan", desc: "Deep scanning for attribution and AI usage." },
+          { to: "/features/learning-path", icon: <Map />, title: "Project Roadmap", desc: "Personalized AI-generated learning milestones." }
+        ].map((item, idx) => (
+          <Link
+            key={idx}
+            to={item.to}
+            className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 transition-all group"
+          >
+            <div className="w-16 h-16 bg-primary/5 rounded-[1.5rem] flex items-center justify-center text-primary mb-8 group-hover:bg-primary group-hover:text-white transition-all">
+              {React.cloneElement(item.icon, { className: "w-8 h-8" })}
+            </div>
+            <h3 className="text-2xl font-black mb-4 text-accent tracking-tight">{item.title}</h3>
+            <p className="text-gray-400 font-medium leading-tight">{item.desc}</p>
+          </Link>
+        ))}
       </div>
     </div>
   );
@@ -113,71 +99,74 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+        <React.Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/test-math" element={<MathSolver />} />
 
-          {/* Protected Routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
+            {/* Protected Routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/features/video-summarizer" element={
-            <ProtectedRoute>
-              <VideoSummarizer />
-            </ProtectedRoute>
-          } />
+            <Route path="/features/video-summarizer" element={
+              <ProtectedRoute>
+                <VideoSummarizer />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/features/quiz-generator" element={
-            <ProtectedRoute>
-              <QuizGenerator />
-            </ProtectedRoute>
-          } />
+            <Route path="/features/quiz-generator" element={
+              <ProtectedRoute>
+                <QuizGenerator />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/features/handwriting-recognition" element={
-            <ProtectedRoute>
-              <HandwritingRecognition />
-            </ProtectedRoute>
-          } />
+            <Route path="/features/handwriting-recognition" element={
+              <ProtectedRoute>
+                <HandwritingRecognition />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/features/math-solver" element={
-            <ProtectedRoute>
-              <MathSolver />
-            </ProtectedRoute>
-          } />
+            <Route path="/features/math-solver" element={
+              <ProtectedRoute>
+                <MathSolver />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/features/essay-grader" element={
-            <ProtectedRoute>
-              <EssayGrader />
-            </ProtectedRoute>
-          } />
+            <Route path="/features/essay-grader" element={
+              <ProtectedRoute>
+                <EssayGrader />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/features/virtual-tutor" element={
-            <ProtectedRoute>
-              <VirtualTutor />
-            </ProtectedRoute>
-          } />
+            <Route path="/features/virtual-tutor" element={
+              <ProtectedRoute>
+                <VirtualTutor />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/features/plagiarism-checker" element={
-            <ProtectedRoute>
-              <PlagiarismChecker />
-            </ProtectedRoute>
-          } />
+            <Route path="/features/plagiarism-checker" element={
+              <ProtectedRoute>
+                <PlagiarismChecker />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/features/learning-path" element={
-            <ProtectedRoute>
-              <LearningPath />
-            </ProtectedRoute>
-          } />
+            <Route path="/features/learning-path" element={
+              <ProtectedRoute>
+                <LearningPath />
+              </ProtectedRoute>
+            } />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+            {/* Fallback */}
+          </Routes>
+        </React.Suspense>
       </Router>
     </AuthProvider>
   );

@@ -5,6 +5,7 @@ import uuid
 import shutil
 from datetime import datetime
 from database import get_database
+from bson import ObjectId
 from routers.auth import get_current_user
 from models import UserResponse
 from ai_client import client
@@ -52,12 +53,15 @@ async def get_pro_solution(expression: str) -> str:
     
     prompt = (
         f"Problem: {expression}\n\n"
-        "Please provide a professional, step-by-step solution. "
-        "Requirements:\n"
-        "1. Use LaTeX for ALL mathematical symbols and expressions ($...$ for inline, $$...$$ for blocks).\n"
-        "2. Explain the REASONING behind each step clearly.\n"
-        "3. State any formulas or theorems used.\n"
-        "4. Provide the final answer clearly at the end."
+        "Please provide a rigorous, professional, step-by-step mathematical solution. "
+        "Strict Formatting Requirements:\n"
+        "1. Use LaTeX for ALL mathematical symbols, variables, and expressions.\n"
+        "2. Use $...$ for inline math (e.g., $x = 5$).\n"
+        "3. Use $$...$$ for standalone block equations or derivations.\n"
+        "4. NEVER use plain text for math (e.g., don't write 'x^2', write '$x^2$').\n"
+        "5. Explain the REASONING behind each step clearly.\n"
+        "6. State every formula or theorem used in its own LaTeX block.\n"
+        "7. Provide the final result in a bold, boxed LaTeX format at the very end."
     )
     
     try:
@@ -174,7 +178,14 @@ async def delete_math_item(
     current_user: UserResponse = Depends(get_current_user)
 ):
     db = await get_database()
-    result = await db.math_solutions.delete_one({"_id": math_id, "user_id": current_user.id})
+    
+    math_filter = {"user_id": current_user.id}
+    try:
+        math_filter["_id"] = ObjectId(math_id)
+    except:
+        math_filter["_id"] = math_id
+
+    result = await db.math_solutions.delete_one(math_filter)
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"status": "success"}

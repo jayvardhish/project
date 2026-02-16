@@ -1,7 +1,30 @@
-
 import os
 import cv2
+import yt_dlp
 from moviepy.editor import VideoFileClip
+
+def download_youtube_audio(video_url, output_path_base):
+    """
+    Downloads raw audio from a YouTube video. 
+    Returns the actual path of the downloaded file.
+    """
+    try:
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'outtmpl': output_path_base + '.%(ext)s', # Let yt-dlp append the extension
+            'quiet': True,
+            'no_warnings': True,
+            'nopostprocess': True,
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=True)
+            ext = info.get('ext', 'm4a')
+            actual_path = f"{output_path_base}.{ext}"
+            return actual_path
+    except Exception as e:
+        print(f"YouTube Audio Download Error: {e}")
+        return None
 
 def extract_audio(video_path, output_audio_path):
     """

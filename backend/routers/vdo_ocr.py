@@ -4,6 +4,7 @@ import os
 import shutil
 import uuid
 from database import get_database
+from bson import ObjectId
 from routers.auth import get_current_user
 from models import UserResponse
 from ai_client import client
@@ -21,7 +22,15 @@ async def extract_text_from_video(
     current_user: UserResponse = Depends(get_current_user)
 ):
     db = await get_database()
-    video = await db.videos.find_one({"_id": video_id, "user_id": current_user.id})
+    
+    # Try finding by ObjectId if valid, else by string
+    video_filter = {"user_id": current_user.id}
+    try:
+        video_filter["_id"] = ObjectId(video_id)
+    except:
+        video_filter["_id"] = video_id
+
+    video = await db.videos.find_one(video_filter)
     
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
@@ -79,7 +88,7 @@ async def extract_text_from_video(
                 
         # 5. Save results to DB
         await db.videos.update_one(
-            {"_id": video_id},
+            video_filter,
             {"$set": {"video_ocr_text": refined_text}}
         )
         

@@ -6,6 +6,7 @@ import shutil
 import base64
 from datetime import datetime
 from database import get_database
+from bson import ObjectId
 from routers.auth import get_current_user
 from models import UserResponse
 from ai_client import client
@@ -38,7 +39,7 @@ async def perform_vision_ocr(content: bytes, mime_type: str, mode: str) -> str:
 
     try:
         response = client.chat.completions.create(
-            model="deepseek/deepseek-chat", # Assuming vision capabilities or proxy handling
+            model="google/gemini-2.0-flash-001", 
             messages=[
                 {"role": "system", "content": system_prompt},
                 {
@@ -132,7 +133,14 @@ async def delete_ocr_item(
     current_user: UserResponse = Depends(get_current_user)
 ):
     db = await get_database()
-    result = await db.ocr.delete_one({"_id": ocr_id, "user_id": current_user.id})
+    
+    ocr_filter = {"user_id": current_user.id}
+    try:
+        ocr_filter["_id"] = ObjectId(ocr_id)
+    except:
+        ocr_filter["_id"] = ocr_id
+
+    result = await db.ocr.delete_one(ocr_filter)
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="OCR record not found.")
     return {"status": "success"}
