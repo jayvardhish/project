@@ -20,11 +20,11 @@ services:
         sync: false
 
   # Frontend Service
-  - type: static
+  - type: web
     name: smart-learning-frontend
-    env: node
+    env: static
     buildCommand: cd frontend && npm install && npm run build
-    publishDir: frontend/dist
+    staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
         fromService:
