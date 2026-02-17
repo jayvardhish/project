@@ -142,4 +142,5 @@ websockets
 wrapt
 wsproto
 youtube-transcript-api
+yt-dlp
 zipp
