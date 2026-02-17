@@ -143,7 +143,7 @@ allow_insecure_http=True
 github_sso = GithubSSO(
 client_id=os.getenv("GITHUB_CLIENT_ID"),
 client_secret=os.getenv("GITHUB_CLIENT_SECRET"),
-redirect_uri=os.getenv("BACKEND_URL") + "/api/auth/github/callback"
+redirect_uri=os.getenv("BACKEND_URL") + "/api/auth/github/callback",
 
 allow_insecure_http=True
 )
