@@ -1,7 +1,7 @@
 import os
 import cv2
 import yt_dlp
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 import speech_recognition as sr
 from ai_client import client
 
