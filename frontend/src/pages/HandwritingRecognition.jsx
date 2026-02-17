@@ -11,7 +11,6 @@ const HandwritingRecognition = () => {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [ocrMode, setOcrMode] = useState('default');
     const [history, setHistory] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
     const [copied, setCopied] = useState(false);
@@ -45,7 +44,7 @@ const HandwritingRecognition = () => {
         setLoading(true);
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('mode', ocrMode);
+        formData.append('mode', 'default');
 
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/ocr/upload`, formData);
@@ -114,8 +113,8 @@ const HandwritingRecognition = () => {
                             whileHover={{ x: 4 }}
                             onClick={() => setSelectedItem(item)}
                             className={`w-full text-left p-4 rounded-2xl transition-all border flex items-center justify-between group ${selectedItem?._id === item._id
-                                    ? 'bg-purple-50 border-purple-100 ring-1 ring-purple-100'
-                                    : 'bg-white border-gray-50 hover:border-gray-200'
+                                ? 'bg-purple-50 border-purple-100 ring-1 ring-purple-100'
+                                : 'bg-white border-gray-50 hover:border-gray-200'
                                 }`}
                         >
                             <div className="min-w-0 pr-4">
@@ -182,24 +181,7 @@ const HandwritingRecognition = () => {
                                 </label>
                             </div>
 
-                            {/* Mode Picker */}
-                            <div className="mt-8 pt-8 border-t border-gray-50">
-                                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Transcription Mode</h3>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {['default', 'structured', 'clean'].map((mode) => (
-                                        <button
-                                            key={mode}
-                                            onClick={() => setOcrMode(mode)}
-                                            className={`py-3 rounded-xl text-xs font-bold capitalize transition-all border-2 ${ocrMode === mode
-                                                    ? 'bg-purple-600 border-purple-600 text-white shadow-lg shadow-purple-100'
-                                                    : 'bg-white border-gray-50 text-gray-400 hover:border-gray-200'
-                                                }`}
-                                        >
-                                            {mode}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
+
 
                             <button
                                 onClick={handleProcess}

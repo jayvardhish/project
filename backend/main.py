@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 # Load environment variables first
 load_dotenv()
 
-from routers import auth, videos, quizzes, ocr, math, essays, chat, plagiarism, learning_path, vdo_ocr
+from routers import auth, videos, quizzes, ocr, math, chat, vdo_ocr
 from database import close_db
 
 # Load environment variables
@@ -54,10 +54,7 @@ app.include_router(videos.router)
 app.include_router(quizzes.router)
 app.include_router(ocr.router)
 app.include_router(math.router)
-app.include_router(essays.router)
 app.include_router(chat.router)
-app.include_router(plagiarism.router)
-app.include_router(learning_path.router)
 app.include_router(vdo_ocr.router)
 
 @app.get("/")

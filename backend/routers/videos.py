@@ -160,10 +160,12 @@ async def summarize_youtube(
 
     except Exception as transcript_err:
         print(f"DEBUG: All transcript methods failed: {transcript_err}")
-        print("DEBUG: Attempting Whisper Fallback...")
+        print("DEBUG: Attempting DeepSeek Transcription Fallback...")
         
-        # Step 2: Whisper Fallback (Optional - only if OpenAI key is available)
+        # Step 2: DeepSeek Transcription Fallback (Free alternative to Whisper)
         try:
+            from utils.video_utils import transcribe_audio_with_deepseek
+            
             # Generate a unique filename for the audio
             audio_id = str(uuid.uuid4())
             audio_base = os.path.join(AUDIO_DIR, audio_id)
@@ -175,32 +177,24 @@ async def summarize_youtube(
             if not audio_path or not os.path.exists(audio_path):
                 raise Exception("Failed to download audio for transcription")
                 
-            # Transcribe with OpenAI Whisper (if available)
-            from ai_client import get_openai_client
-            openai_client = get_openai_client()
+            # Transcribe with DeepSeek
+            print("DEBUG: Transcribing with DeepSeek...")
+            clean_text = transcribe_audio_with_deepseek(audio_path)
             
-            if not openai_client:
-                raise Exception("OpenAI Client not available. Skipping Whisper fallback.")
-            
-            print("DEBUG: Transcribing with Whisper...")
-            with open(audio_path, "rb") as audio_file:
-                transcript_response = openai_client.audio.transcriptions.create(
-                    model="whisper-1", 
-                    file=audio_file
-                )
-            
-            clean_text = transcript_response.text
-            print("DEBUG: Whisper transcription successful")
+            if not clean_text:
+                raise Exception("DeepSeek transcription returned empty text")
+                
+            print("DEBUG: DeepSeek transcription successful")
             
             # Cleanup
             if os.path.exists(audio_path):
                 os.remove(audio_path)
                 
-        except Exception as whisper_err:
-            print(f"DEBUG: Whisper fallback failed: {whisper_err}")
+        except Exception as deepseek_err:
+            print(f"DEBUG: DeepSeek fallback failed: {deepseek_err}")
             raise HTTPException(
                 status_code=404, 
-                detail="No transcript available for this video. The video may not have captions enabled, and Whisper transcription is unavailable (OpenAI quota exceeded or key not set)."
+                detail="No transcript available for this video. The video may not have captions enabled, and audio transcription failed."
             )
 
     if not clean_text:

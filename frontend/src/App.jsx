@@ -12,10 +12,7 @@ const VideoSummarizer = React.lazy(() => import('./pages/VideoSummarizer'));
 const QuizGenerator = React.lazy(() => import('./pages/QuizGenerator'));
 const HandwritingRecognition = React.lazy(() => import('./pages/HandwritingRecognition'));
 const MathSolver = React.lazy(() => import('./pages/MathSolver'));
-const EssayGrader = React.lazy(() => import('./pages/EssayGrader'));
 const VirtualTutor = React.lazy(() => import('./pages/VirtualTutor'));
-const PlagiarismChecker = React.lazy(() => import('./pages/PlagiarismChecker'));
-const LearningPath = React.lazy(() => import('./pages/LearningPath'));
 const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = React.lazy(() => import('./pages/ResetPassword'));
 const About = React.lazy(() => import('./pages/About'));
@@ -51,10 +48,7 @@ const Dashboard = () => {
           { to: "/features/quiz-generator", icon: <BookOpen />, title: "Quiz Generator", desc: "Generate smart assessments from any document." },
           { to: "/features/handwriting-recognition", icon: <PenTool />, title: "Handwriting OCR", desc: "Digitize your handwritten notes with 4K precision." },
           { to: "/features/math-solver", icon: <Calculator />, title: "Math Solver", desc: "Step-by-step LaTeX solutions for equations." },
-          { to: "/features/essay-grader", icon: <FileText />, title: "Essay Grader", desc: "Deep semantic feedback and structural scoring." },
-          { to: "/features/virtual-tutor", icon: <Bot />, title: "Virtual Tutor", desc: "24/7 world-class academic assistance." },
-          { to: "/features/plagiarism-checker", icon: <ShieldAlert />, title: "Integrity Scan", desc: "Deep scanning for attribution and AI usage." },
-          { to: "/features/learning-path", icon: <Map />, title: "Project Roadmap", desc: "Personalized AI-generated learning milestones." }
+          { to: "/features/virtual-tutor", icon: <Bot />, title: "Virtual Tutor", desc: "24/7 world-class academic assistance." }
         ].map((item, idx) => (
           <Link
             key={idx}
@@ -140,27 +134,9 @@ function App() {
               </ProtectedRoute>
             } />
 
-            <Route path="/features/essay-grader" element={
-              <ProtectedRoute>
-                <EssayGrader />
-              </ProtectedRoute>
-            } />
-
             <Route path="/features/virtual-tutor" element={
               <ProtectedRoute>
                 <VirtualTutor />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/features/plagiarism-checker" element={
-              <ProtectedRoute>
-                <PlagiarismChecker />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/features/learning-path" element={
-              <ProtectedRoute>
-                <LearningPath />
               </ProtectedRoute>
             } />
 

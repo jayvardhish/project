@@ -8,14 +8,10 @@ import {
 import axios from 'axios';
 
 const VideoSummarizer = () => {
-    const [file, setFile] = useState(null);
     const [ytUrl, setYtUrl] = useState('');
-    const [uploading, setUploading] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [videos, setVideos] = useState([]);
     const [selectedVideo, setSelectedVideo] = useState(null);
-    const [summaryType, setSummaryType] = useState('detailed');
-    const [activeTab, setActiveTab] = useState('youtube'); // 'youtube' or 'upload'
 
     // Fetch videos on mount
     useEffect(() => {
@@ -31,76 +27,18 @@ const VideoSummarizer = () => {
         }
     };
 
-    const handleFileChange = (e) => {
-        if (e.target.files?.[0]) {
-            setFile(e.target.files[0]);
-        }
-    };
-
-    const handleUpload = async () => {
-        if (!file) return;
-        setUploading(true);
-        const formData = new FormData();
-        formData.append('file', file);
-        try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/videos/upload`, formData);
-            setFile(null);
-            fetchVideos();
-            setActiveTab('upload');
-        } catch (error) {
-            alert("Upload failed. Please try again.");
-        } finally {
-            setUploading(false);
-        }
-    };
-
     const handleYoutubeSummary = async () => {
         if (!ytUrl) return;
         setProcessing(true);
         try {
             const formData = new FormData();
             formData.append('url', ytUrl);
-            formData.append('summary_type', summaryType);
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/videos/youtube`, formData);
             setSelectedVideo(response.data);
             setYtUrl('');
             fetchVideos();
         } catch (error) {
             alert(error.response?.data?.detail || "YouTube summarization failed.");
-        } finally {
-            setProcessing(false);
-        }
-    };
-
-    const handleSummarizeLocal = async (videoId) => {
-        setProcessing(true);
-        try {
-            const formData = new FormData();
-            formData.append('summary_type', summaryType);
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/videos/${videoId}/summarize`, formData);
-
-            // Re-fetch to get updated list, then find the specific video
-            const updatedVideos = await axios.get(`${import.meta.env.VITE_API_URL}/api/videos/`);
-            setVideos(updatedVideos.data);
-            const v = updatedVideos.data.find(v => v._id === videoId);
-            setSelectedVideo(v);
-        } catch (error) {
-            alert("Failed to summarize local video.");
-        } finally {
-            setProcessing(false);
-        }
-    };
-
-    const handleVideoOCR = async (videoId) => {
-        setProcessing(true); // Shared processing state for simplicity
-        try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/vdo-ocr/${videoId}`);
-            const updatedVideos = await axios.get(`${import.meta.env.VITE_API_URL}/api/videos/`);
-            setVideos(updatedVideos.data);
-            const v = updatedVideos.data.find(v => v._id === videoId);
-            setSelectedVideo({ ...v, ocr_view: true }); // Mark that we want to see OCR
-        } catch (error) {
-            alert("OCR Extraction failed.");
         } finally {
             setProcessing(false);
         }
@@ -127,108 +65,27 @@ const VideoSummarizer = () => {
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
                     {/* Left Panel: Inputs & History (Xl: 5 cols) */}
                     <div className="xl:col-span-5 space-y-6">
-                        {/* Control Card */}
+                        {/* YouTube Input Card */}
                         <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-50/50 p-6">
-                            {/* Tabs */}
-                            <div className="flex bg-gray-50 p-1 rounded-2xl mb-8">
-                                <button
-                                    onClick={() => setActiveTab('youtube')}
-                                    className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center space-x-2 ${activeTab === 'youtube' ? 'bg-white text-primary shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                                >
-                                    <Youtube className="w-5 h-5 transition-transform group-hover:scale-110" />
-                                    <span>YouTube</span>
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('upload')}
-                                    className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center space-x-2 ${activeTab === 'upload' ? 'bg-white text-primary shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                                >
-                                    <Upload className="w-5 h-5" />
-                                    <span>Upload</span>
-                                </button>
-                            </div>
-
-                            {/* Active Tab Content */}
-                            <AnimatePresence mode="wait">
-                                {activeTab === 'youtube' ? (
-                                    <motion.div
-                                        key="yt"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        className="space-y-4"
-                                    >
-                                        <div className="relative group">
-                                            <input
-                                                type="text"
-                                                value={ytUrl}
-                                                onChange={(e) => setYtUrl(e.target.value)}
-                                                placeholder="Paste any YouTube URL..."
-                                                className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-medium text-gray-700"
-                                            />
-                                            <Youtube className="absolute left-4 top-1/2 -translate-y-1/2 text-red-500 group-focus-within:scale-110 transition-transform w-6 h-6" />
-                                        </div>
-                                        <button
-                                            onClick={handleYoutubeSummary}
-                                            disabled={!ytUrl || processing}
-                                            className="w-full bg-[#FF0000] hover:bg-red-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-red-100 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
-                                        >
-                                            {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-                                            <span>Start Intelligence Extraction</span>
-                                        </button>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div
-                                        key="up"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        className="space-y-4"
-                                    >
-                                        <div className="border-2 border-dashed border-gray-100 rounded-3xl p-8 flex flex-col items-center justify-center text-center hover:border-primary/30 transition-colors group">
-                                            <div className="w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
-                                                <FileVideo className="w-8 h-8" />
-                                            </div>
-                                            <input
-                                                type="file"
-                                                id="file-up"
-                                                className="hidden"
-                                                accept="video/*"
-                                                onChange={handleFileChange}
-                                            />
-                                            <label htmlFor="file-up" className="cursor-pointer mb-2">
-                                                <span className="text-lg font-bold text-gray-800">{file ? file.name : "Select Video File"}</span>
-                                            </label>
-                                            <p className="text-gray-400 text-sm mb-6">MP4, MOV, or AVI (Max 100MB)</p>
-                                            <button
-                                                onClick={handleUpload}
-                                                disabled={!file || uploading}
-                                                className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:scale-105 active:scale-95 transition-all disabled:opacity-50 flex items-center space-x-2"
-                                            >
-                                                {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
-                                                <span>{uploading ? "Uploading..." : "Upload & Analyze"}</span>
-                                            </button>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            {/* Style Selectors */}
-                            <div className="mt-8 pt-8 border-t border-gray-100">
-                                <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">Summary Configuration</h3>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {['brief', 'detailed', 'bullet'].map((type) => (
-                                        <button
-                                            key={type}
-                                            onClick={() => setSummaryType(type)}
-                                            className={`py-3 px-2 rounded-xl text-xs font-bold capitalize transition-all border-2 ${summaryType === type
-                                                    ? 'bg-primary/5 border-primary text-primary shadow-sm'
-                                                    : 'bg-white border-gray-50 text-gray-400 hover:border-gray-200'
-                                                }`}
-                                        >
-                                            {type}
-                                        </button>
-                                    ))}
+                            <div className="space-y-4">
+                                <div className="relative group">
+                                    <input
+                                        type="text"
+                                        value={ytUrl}
+                                        onChange={(e) => setYtUrl(e.target.value)}
+                                        placeholder="Paste YouTube URL..."
+                                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-primary focus:bg-white outline-none transition-all font-medium text-gray-700"
+                                    />
+                                    <Youtube className="absolute left-4 top-1/2 -translate-y-1/2 text-red-500 w-6 h-6" />
                                 </div>
+                                <button
+                                    onClick={handleYoutubeSummary}
+                                    disabled={!ytUrl || processing}
+                                    className="w-full bg-[#FF0000] hover:bg-red-700 text-white py-4 rounded-2xl font-bold shadow-lg transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
+                                >
+                                    {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                                    <span>Summarize Video</span>
+                                </button>
                             </div>
                         </div>
 
@@ -251,8 +108,8 @@ const VideoSummarizer = () => {
                                         whileHover={{ x: 5 }}
                                         onClick={() => setSelectedVideo(video)}
                                         className={`p-4 rounded-2xl cursor-pointer transition-all border flex items-center justify-between group ${selectedVideo?._id === video._id
-                                                ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10'
-                                                : 'bg-white border-gray-50 hover:border-gray-200'
+                                            ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10'
+                                            : 'bg-white border-gray-50 hover:border-gray-200'
                                             }`}
                                     >
                                         <div className="flex items-center space-x-4 min-w-0">

@@ -142,5 +142,11 @@ websockets
 wrapt
 wsproto
 youtube-transcript-api
+
+# Video transcription dependencies
+SpeechRecognition==3.10.0
+pydub==0.25.1
 yt-dlp
 zipp
+gunicorn==21.2.0
+uvicorn==0.27.1

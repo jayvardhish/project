@@ -45,6 +45,17 @@ const VirtualTutor = () => {
         }
     };
 
+    const clearChat = async () => {
+        if (!window.confirm('Clear all chat history?')) return;
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/chat/history`);
+            setChat([]);
+        } catch (error) {
+            console.error("Failed to clear chat:", error);
+            alert("Failed to clear chat history.");
+        }
+    };
+
     return (
         <div className="flex flex-col h-[calc(100vh-140px)] bg-gray-50">
             {/* Header */}
@@ -61,7 +72,7 @@ const VirtualTutor = () => {
                         </div>
                     </div>
                 </div>
-                <button className="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                <button onClick={clearChat} className="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Clear Chat">
                     <Trash2 className="w-5 h-5" />
                 </button>
             </div>

@@ -51,6 +51,14 @@ const QuizGenerator = () => {
         return score;
     };
 
+    const shuffleQuestions = () => {
+        const shuffled = [...quiz.questions].sort(() => Math.random() - 0.5);
+        setQuiz({ ...quiz, questions: shuffled });
+        setUserAnswers({});
+        setCurrentStep(3);
+        setShowResults(false);
+    };
+
     return (
         <div className="p-8 max-w-5xl mx-auto">
             <div className="mb-12">
@@ -191,9 +199,14 @@ const QuizGenerator = () => {
                                 <Trophy className="w-20 h-20 mx-auto mb-6 text-yellow-300" />
                                 <h2 className="text-5xl font-bold mb-2">Quiz Results</h2>
                                 <p className="text-2xl text-purple-100 mb-8">You scored <span className="text-white bg-white/30 px-3 py-1 rounded-lg">{calculateScore()} / {quiz.questions.length}</span></p>
-                                <button onClick={() => setCurrentStep(1)} className="bg-white text-primary px-8 py-3 rounded-xl font-bold hover:bg-white/90 transition-all">
-                                    Try Again
-                                </button>
+                                <div className="flex gap-4 justify-center">
+                                    <button onClick={() => { setCurrentStep(1); setQuiz(null); setUserAnswers({}); }} className="bg-white text-primary px-8 py-3 rounded-xl font-bold hover:bg-white/90 transition-all">
+                                        New Quiz
+                                    </button>
+                                    <button onClick={shuffleQuestions} className="bg-white/20 text-white border-2 border-white px-8 py-3 rounded-xl font-bold hover:bg-white/30 transition-all">
+                                        Shuffle & Retry
+                                    </button>
+                                </div>
                             </div>
                             <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
                                 {/* Decorative dots or patterns */}

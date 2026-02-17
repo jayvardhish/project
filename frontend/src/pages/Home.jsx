@@ -108,11 +108,8 @@ const Home = () => {
                         { icon: <Video />, title: "Video Summarizer", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f", color: "blue", desc: "Transcribe any video lecture into professional notes instantly." },
                         { icon: <BookOpen />, title: "Quiz Generator", image: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d", color: "purple", desc: "Convert PDFs and notes into intelligent, personalized quizzes." },
                         { icon: <Calculator />, title: "Math Solver", image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb", color: "indigo", desc: "Complex equations solved step-by-step with high-fidelity LaTeX." },
-                        { icon: <PenTool />, title: "Essay Grader", image: "https://images.unsplash.com/photo-1455390582262-044cdead277a", color: "rose", desc: "Professional AI feedback to elevate your writing style and structure." },
                         { icon: <MessageSquare />, title: "Virtual Tutor", image: "https://images.unsplash.com/photo-1531482615713-2afd69097998", color: "cyan", desc: "A world-class academic assistant available 24/7 for any subject." },
-                        { icon: <Layers />, title: "Learning Paths", image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4", color: "amber", desc: "Adaptive curricula that evolve based on your individual progress." },
-                        { icon: <Zap />, title: "Handwriting OCR", image: "https://images.unsplash.com/photo-1517842645767-c639042777db", color: "violet", desc: "Snap a photo of your handwritten notes and digitize them in 4K." },
-                        { icon: <ShieldCheck />, title: "Plagiarism Check", image: "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d", color: "emerald", desc: "Ensure total academic integrity with deep semantic scanning." }
+                        { icon: <Zap />, title: "Handwriting OCR", image: "https://images.unsplash.com/photo-1517842645767-c639042777db", color: "violet", desc: "Snap a photo of your handwritten notes and digitize them in 4K." }
                     ].map((feature, idx) => (
                         <motion.div
                             key={idx}

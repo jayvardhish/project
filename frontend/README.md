@@ -1,16 +1,104 @@
-# React + Vite
+# Frontend - SmartLearn UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern React application built with Vite and TailwindCSS.
 
-Currently, two official plugins are available:
+## 📁 Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```
+frontend/
+├── src/
+│   ├── pages/                    # Page components
+│   │   ├── Home.jsx             # Landing page
+│   │   ├── Login.jsx            # Login page
+│   │   ├── Signup.jsx           # Registration
+│   │   ├── VideoSummarizer.jsx  # Video feature
+│   │   ├── QuizGenerator.jsx    # Quiz feature
+│   │   ├── MathSolver.jsx       # Math feature
+│   │   ├── HandwritingRecognition.jsx
+│   │   └── VirtualTutor.jsx     # Chat feature
+│   │
+│   ├── components/              # Reusable components
+│   │   └── Navbar.jsx          # Navigation bar
+│   │
+│   ├── context/                 # React Context
+│   │   └── AuthContext.jsx     # Authentication state
+│   │
+│   ├── App.jsx                  # Main app & routing
+│   ├── main.jsx                 # Entry point
+│   └── index.css                # Global styles
+│
+├── package.json                 # Dependencies
+├── vite.config.js              # Vite configuration
+└── tailwind.config.js          # TailwindCSS config
+```
 
-## React Compiler
+## 🔧 Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-## Expanding the ESLint configuration
+2. **Configure environment** (create `.env`):
+   ```env
+   VITE_API_URL=http://localhost:5000
+   VITE_GOOGLE_CLIENT_ID=your-google-client-id
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3. **Run development server**:
+   ```bash
+   npm run dev
+   ```
+   App runs at `http://localhost:5173`
+
+4. **Build for production**:
+   ```bash
+   npm run build
+   ```
+
+## 🎨 Design System
+
+### Colors
+- **Primary**: `#7C3AED` (Purple)
+- **Secondary**: `#FDE047` (Yellow)
+- **Accent**: `#0F172A` (Dark)
+
+### Components
+- **Glass Card**: Frosted glass effect with backdrop blur
+- **Glass Pill**: Rounded badge with translucent background
+- **Button Primary**: Purple gradient with shadow
+- **Button Secondary**: White with border
+
+### Typography
+- **Headings**: Outfit font, extrabold
+- **Body**: Inter font, regular
+
+## 🔑 Key Features
+
+### Authentication
+- JWT token storage in localStorage
+- Automatic token refresh
+- Protected routes with `<ProtectedRoute>`
+
+### Routing
+- React Router v7
+- Lazy loading for code splitting
+- Protected routes for authenticated users
+
+### State Management
+- React Context for global auth state
+- Local state for component-specific data
+
+## 🐛 Common Issues
+
+**Build fails**:
+- Delete `node_modules` and `package-lock.json`
+- Run `npm install` again
+
+**API calls fail**:
+- Check `VITE_API_URL` in `.env`
+- Ensure backend is running
+
+**Styles not loading**:
+- Clear browser cache
+- Restart dev server

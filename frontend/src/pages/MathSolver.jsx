@@ -357,7 +357,6 @@ const MathSolver = () => {
                                                 <ReactMarkdown
                                                     remarkPlugins={[remarkMath]}
                                                     rehypePlugins={[rehypeKatex]}
-                                                    className="math-markdown"
                                                     components={{
                                                         p: ({ children }) => <p className="mb-4 leading-relaxed text-gray-700">{children}</p>,
                                                         li: ({ children }) => <li className="mb-2 text-gray-700">{children}</li>

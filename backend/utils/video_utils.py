@@ -2,6 +2,8 @@ import os
 import cv2
 import yt_dlp
 from moviepy.editor import VideoFileClip
+import speech_recognition as sr
+from ai_client import client
 
 def download_youtube_audio(video_url, output_path_base):
     """
@@ -24,6 +26,53 @@ def download_youtube_audio(video_url, output_path_base):
             return actual_path
     except Exception as e:
         print(f"YouTube Audio Download Error: {e}")
+        return None
+
+def transcribe_audio_with_deepseek(audio_path):
+    """
+    Transcribe audio using local speech recognition + DeepSeek for cleanup.
+    This is a free alternative to OpenAI Whisper.
+    """
+    try:
+        # Use SpeechRecognition with Google's free API for initial transcription
+        recognizer = sr.Recognizer()
+        
+        # Convert to WAV if needed (SpeechRecognition works best with WAV)
+        wav_path = audio_path.replace('.m4a', '.wav').replace('.mp3', '.wav')
+        
+        if not wav_path.endswith('.wav'):
+            from pydub import AudioSegment
+            audio = AudioSegment.from_file(audio_path)
+            audio.export(wav_path, format='wav')
+        
+        # Transcribe using Google Speech Recognition (free)
+        with sr.AudioFile(wav_path) as source:
+            audio_data = recognizer.record(source)
+            raw_text = recognizer.recognize_google(audio_data)
+        
+        # If we got this far, we have a basic transcription
+        # Now use DeepSeek to clean it up and add punctuation
+        if client:
+            response = client.chat.completions.create(
+                model="deepseek/deepseek-chat",
+                messages=[
+                    {"role": "system", "content": "You are a professional transcription editor. Clean up the following transcription by adding proper punctuation, capitalization, and formatting. Keep the exact words but make it readable."},
+                    {"role": "user", "content": raw_text}
+                ],
+                max_tokens=client.default_max_tokens
+            )
+            cleaned_text = response.choices[0].message.content.strip()
+            
+            # Cleanup temp WAV file
+            if wav_path != audio_path and os.path.exists(wav_path):
+                os.remove(wav_path)
+                
+            return cleaned_text
+        else:
+            return raw_text
+            
+    except Exception as e:
+        print(f"DeepSeek Transcription Error: {e}")
         return None
 
 def extract_audio(video_path, output_audio_path):

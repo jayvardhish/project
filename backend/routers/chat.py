@@ -65,3 +65,9 @@ async def get_chat_history(current_user: UserResponse = Depends(get_current_user
     for h in history:
         h["_id"] = str(h["_id"])
     return history
+
+@router.delete("/history")
+async def clear_chat_history(current_user: UserResponse = Depends(get_current_user)):
+    db = await get_database()
+    result = await db.chat_history.delete_many({"user_id": current_user.id})
+    return {"status": "success", "deleted_count": result.deleted_count}
