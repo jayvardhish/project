@@ -21,7 +21,8 @@ class EmailUtils:
         self.fm = FastMail(self.conf)
 
     async def send_password_reset_email(self, email: EmailStr, token: str):
-        reset_link = f"http://localhost:5173/reset-password?token={token}"
+        frontend_url = os.getenv("CLIENT_URL", "http://localhost:5173")
+        reset_link = f"{frontend_url}/reset-password?token={token}"
         
         html = f"""
         <p>Hello,</p>
