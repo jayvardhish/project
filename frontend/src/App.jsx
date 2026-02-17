@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import { Video, BookOpen, MessageSquare, PenTool, Calculator, FileText, Bot, ShieldAlert, Map, LayoutDashboard, LogOut, User as UserIcon, Zap } from 'lucide-react';
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 // Lazy Load Pages for Performance
 const Home = React.lazy(() => import('./pages/Home'));
 const Login = React.lazy(() => import('./pages/Login'));
@@ -29,6 +31,7 @@ const PageLoader = () => (
 
 // Basic components (to be created)
 const Dashboard = () => {
+  console.log("Dashboard component rendered");
   const { user } = useAuth();
   return (
     <div className="p-10 lg:p-16">
@@ -90,60 +93,63 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+  console.log("App component rendered");
   return (
     <AuthProvider>
-      <Router>
-        <React.Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/test-math" element={<MathSolver />} />
+      <ErrorBoundary>
+        <Router>
+          <React.Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/test-math" element={<MathSolver />} />
 
-            {/* Protected Routes */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
+              {/* Protected Routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
 
-            <Route path="/features/video-summarizer" element={
-              <ProtectedRoute>
-                <VideoSummarizer />
-              </ProtectedRoute>
-            } />
+              <Route path="/features/video-summarizer" element={
+                <ProtectedRoute>
+                  <VideoSummarizer />
+                </ProtectedRoute>
+              } />
 
-            <Route path="/features/quiz-generator" element={
-              <ProtectedRoute>
-                <QuizGenerator />
-              </ProtectedRoute>
-            } />
+              <Route path="/features/quiz-generator" element={
+                <ProtectedRoute>
+                  <QuizGenerator />
+                </ProtectedRoute>
+              } />
 
-            <Route path="/features/handwriting-recognition" element={
-              <ProtectedRoute>
-                <HandwritingRecognition />
-              </ProtectedRoute>
-            } />
+              <Route path="/features/handwriting-recognition" element={
+                <ProtectedRoute>
+                  <HandwritingRecognition />
+                </ProtectedRoute>
+              } />
 
-            <Route path="/features/math-solver" element={
-              <ProtectedRoute>
-                <MathSolver />
-              </ProtectedRoute>
-            } />
+              <Route path="/features/math-solver" element={
+                <ProtectedRoute>
+                  <MathSolver />
+                </ProtectedRoute>
+              } />
 
-            <Route path="/features/virtual-tutor" element={
-              <ProtectedRoute>
-                <VirtualTutor />
-              </ProtectedRoute>
-            } />
+              <Route path="/features/virtual-tutor" element={
+                <ProtectedRoute>
+                  <VirtualTutor />
+                </ProtectedRoute>
+              } />
 
-            {/* Fallback */}
-          </Routes>
-        </React.Suspense>
-      </Router>
+              {/* Fallback */}
+            </Routes>
+          </React.Suspense>
+        </Router>
+      </ErrorBoundary>
     </AuthProvider>
   );
 }

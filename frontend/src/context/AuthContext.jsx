@@ -26,20 +26,41 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
+        console.log("AuthContext: Checking token...", { hasToken: !!token });
         if (token) {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             fetchCurrentUser();
         } else {
+            console.log("AuthContext: No token, unlocking loading");
             setLoading(false);
         }
+
+        // Safety timeout: 3 seconds is plenty for a local/fast API
+        const timer = setTimeout(() => {
+            setLoading(prev => {
+                if (prev) {
+                    console.warn("AuthContext: API taking too long, bypassing loading screen");
+                    return false;
+                }
+                return prev;
+            });
+        }, 3000);
+
+        return () => clearTimeout(timer);
     }, [token]);
 
     const fetchCurrentUser = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/me`);
+            const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/me`;
+            console.log("AuthContext: Fetching from:", apiUrl);
+            const response = await axios.get(apiUrl, { timeout: 4000 });
             setUser(response.data);
+            console.log("AuthContext: User verified");
         } catch (error) {
-            console.error("Failed to fetch user:", error);
+            console.error("AuthContext: Auth check failed:", error.message);
+            if (error.response) {
+                console.error("AuthContext: Server responded with status:", error.response.status);
+            }
             logout();
         } finally {
             setLoading(false);
@@ -74,8 +95,9 @@ export const AuthProvider = ({ children }) => {
             {loading ? (
                 <div className="min-h-screen flex items-center justify-center bg-gray-50">
                     <div className="flex flex-col items-center">
-                        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-                        <p className="font-bold text-gray-400 text-sm tracking-widest uppercase italic">Smart<span className="text-primary">Learn</span> Loading...</p>
+                        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6"></div>
+                        <h2 className="text-2xl font-black text-accent tracking-tighter italic">Smart<span className="text-primary">Learn</span></h2>
+                        <p className="font-bold text-gray-400 text-xs tracking-[0.3em] uppercase mt-2">Initializing Multimodal Engine</p>
                     </div>
                 </div>
             ) : children}

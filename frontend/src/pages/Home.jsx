@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { BookOpen, Video, PenTool, Calculator, MessageSquare, ShieldCheck, Zap, Layers } from 'lucide-react';
 
 const Home = () => {
+    console.log("Home component rendered");
     return (
         <div className="min-h-screen bg-white">
             {/* Navigation */}
