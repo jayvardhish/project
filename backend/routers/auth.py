@@ -203,7 +203,8 @@ new_user = {
 await db.users.insert_one(new_user)
 
 access_token = create_access_token(data={"sub": user.email})
-return RedirectResponse(url=f"http://localhost:5173/dashboard?token={access_token}")
+frontend_url = os.getenv("FRONTEND_URL")
+return RedirectResponse(url=f"{frontend_url}/dashboard?token={access_token}")
 except Exception as e:
 print(f"GitHub Auth Error: {e}")
 raise HTTPException(status_code=400, detail="GitHub Authentication Failed")
