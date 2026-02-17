@@ -112,7 +112,8 @@ token = create_password_reset_token(request.email)
 # Send actual email
 await email_utils.send_password_reset_email(request.email, token)
 # Keep logging for debug/dev purposes
-print(f"PASSWORD RESET LINK: http://localhost:5173/reset-password?token={token}")
+frontend_url = os.getenv("FRONTEND_URL")
+print(f"PASSWORD RESET LINK: {frontend_url}/reset-password?token={token}")
 
 return {"message": "If an account exists with this email, you will receive a reset link shortly."}
 
