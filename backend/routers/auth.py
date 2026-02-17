@@ -136,14 +136,14 @@ google_sso = GoogleSSO(
     client_id=os.getenv("GOOGLE_CLIENT_ID"),
     client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
     redirect_uri=os.getenv("GOOGLE_REDIRECT_URI"),
-    allow_insecure_http=True
+    allow_insecure_http=False
 )
 
 github_sso = GithubSSO(
     client_id=os.getenv("GITHUB_CLIENT_ID"),
     client_secret=os.getenv("GITHUB_CLIENT_SECRET"),
-    redirect_uri="http://localhost:5000/api/auth/github/callback",
-    allow_insecure_http=True
+    redirect_uri=os.getenv("GITHUB_REDIRECT_URI"),
+    allow_insecure_http=False
 )
 
 @router.get("/google/login")
