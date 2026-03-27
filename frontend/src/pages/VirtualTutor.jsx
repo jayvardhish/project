@@ -46,7 +46,6 @@ const VirtualTutor = () => {
     };
 
     const clearChat = async () => {
-        if (!window.confirm('Clear all chat history?')) return;
         try {
             await axios.delete(`${import.meta.env.VITE_API_URL}/api/chat/history`);
             setChat([]);
@@ -91,7 +90,7 @@ const VirtualTutor = () => {
             </header>
 
             {/* Chat Messages */}
-            <div className="flex-grow overflow-y-auto p-8 lg:p-14 space-y-12 scrollbar-hide">
+            <div className="flex-grow overflow-y-auto p-4 lg:p-8 space-y-8 scrollbar-hide">
                 {chat.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-full text-center space-y-12 py-20 relative">
                         <motion.div 
@@ -141,7 +140,7 @@ const VirtualTutor = () => {
                                 }`}>
                                 {msg.role === 'user' ? <User className="w-7 h-7" /> : <Bot className="w-7 h-7" />}
                             </div>
-                            <div className={`p-8 lg:p-10 rounded-[3rem] shadow-2xl relative group/msg transition-all ${msg.role === 'user'
+                            <div className={`p-5 lg:p-7 rounded-[2rem] shadow-lg relative group/msg transition-all ${msg.role === 'user'
                                 ? 'bg-accent text-white rounded-br-none shadow-accent/10'
                                 : 'bg-white text-gray-700 border border-gray-50 rounded-bl-none shadow-primary/5'
                                 }`}>
@@ -150,8 +149,8 @@ const VirtualTutor = () => {
                                         <Copy className="w-4 h-4" />
                                     </button>
                                 </div>
-                                <p className="text-lg lg:text-xl font-bold leading-[1.6] italic tracking-tight selection:bg-white/20 whitespace-pre-wrap">{msg.content}</p>
-                                <div className={`flex items-center gap-3 mt-8 opacity-40 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                <p className="text-base lg:text-lg font-medium leading-relaxed tracking-tight selection:bg-white/20 whitespace-pre-wrap">{msg.content}</p>
+                                <div className={`flex items-center gap-3 mt-4 opacity-50 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`w-1 h-1 rounded-full ${msg.role === 'user' ? 'bg-white' : 'bg-primary'}`}></div>
                                     <p className="text-[10px] font-black uppercase tracking-[0.2em]">
                                         {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -181,7 +180,7 @@ const VirtualTutor = () => {
             </div>
 
             {/* Input Area */}
-            <footer className="p-8 lg:p-12 bg-white/80 backdrop-blur-xl border-t border-gray-100 sticky bottom-0 z-30">
+            <footer className="p-4 lg:p-6 bg-white/90 backdrop-blur-xl border-t border-gray-100 sticky bottom-0 z-30">
                 <div className="max-w-5xl mx-auto">
                     <div className="flex items-center gap-6">
                         <div className="relative flex-grow group">
@@ -192,9 +191,9 @@ const VirtualTutor = () => {
                                 onChange={(e) => setMessage(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                                 placeholder="Sequence your academic query..."
-                                className="w-full px-10 py-7 bg-gray-50/50 border border-transparent rounded-[2.5rem] focus:bg-white focus:border-primary/20 focus:ring-8 focus:ring-primary/5 outline-none transition-all pr-24 font-bold text-xl text-accent placeholder:text-gray-300 relative z-10 italic tracking-tight"
+                                className="w-full px-8 py-5 bg-gray-50/50 border border-transparent rounded-[2rem] focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all pr-20 font-bold text-lg text-accent placeholder:text-gray-400 relative z-10"
                             />
-                            <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-4 z-20">
+                            <div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-3 z-20">
                                 <button className="p-3 text-gray-200 hover:text-primary transition-all rounded-xl hover:bg-primary/5 group/btn">
                                     <BookOpen className="w-6 h-6 group-hover/btn:scale-110 transition-transform" />
                                 </button>
@@ -205,9 +204,9 @@ const VirtualTutor = () => {
                         <button
                             onClick={handleSend}
                             disabled={!message.trim() || loading}
-                            className="w-20 h-20 btn-primary rounded-[2.2rem] flex items-center justify-center shadow-2xl shadow-primary/30 active:scale-95 disabled:opacity-50 group shrink-0"
+                            className="w-16 h-16 btn-primary rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-primary/30 active:scale-95 disabled:opacity-50 group shrink-0"
                         >
-                            <Send className="w-8 h-8 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                            <Send className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                         </button>
                     </div>
                     <div className="mt-6 flex items-center justify-center gap-8 opacity-20 pointer-events-none grayscale">
