@@ -37,21 +37,13 @@ async def perform_vision_ocr(content: bytes, mime_type: str, mode: str) -> str:
         system_prompt = "You are an accurate OCR system for handwritten text."
         user_prompt = "Please accurately transcribe all handwritten text in this image. Do not add any commentary. Output ONLY the text found."
 
-    # Determine vision model based on engine
-    vision_model = "google/gemini-2.0-flash-001"
-    if getattr(client, "is_fallback", False):
-        vision_model = "gpt-4o-mini"
-    elif not getattr(client, "is_openrouter", False):
-        # If it's direct DeepSeek, they don't have vision in 'deepseek-chat'
-        # We must fallback to OpenAI if possible
-        from ai_client import openai_client
-        if openai_client:
-            vision_model = "gpt-4o-mini"
-            vision_client = openai_client
-        else:
-            return "" # Cannot do vision with direct DeepSeek 'deepseek-chat'
-    else:
+    # Try to use Groq's Vision model if Groq is active
+    if not getattr(client, "is_fallback", False) and getattr(client, "model_name", "") == "llama-3.3-70b-versatile":
+        vision_model = "llama-3.2-11b-vision-preview"
         vision_client = client
+    else:
+        # If fallback is active (DeepSeek etc.), they might not support vision cleanly here
+        return ""
 
     try:
         response = vision_client.chat.completions.create(
