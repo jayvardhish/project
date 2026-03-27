@@ -53,14 +53,12 @@ export const AuthProvider = ({ children }) => {
         try {
             const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/me`;
             console.log("AuthContext: Fetching from:", apiUrl);
-            const response = await axios.get(apiUrl, { timeout: 4000 });
+            const response = await axios.get(apiUrl, { timeout: 8000 });
             setUser(response.data);
             console.log("AuthContext: User verified");
         } catch (error) {
             console.error("AuthContext: Auth check failed:", error.message);
-            if (error.response) {
-                console.error("AuthContext: Server responded with status:", error.response.status);
-            }
+            // If it's a 401, just clear the user but stop loading
             logout();
         } finally {
             setLoading(false);

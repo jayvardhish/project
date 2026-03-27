@@ -150,3 +150,9 @@ yt-dlp
 zipp
 gunicorn==21.2.0
 uvicorn==0.27.1
+langcodes
+httpx
+tiktoken
+chromadb
+sentence-transformers
+google-api-python-client

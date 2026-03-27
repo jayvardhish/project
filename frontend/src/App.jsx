@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import { motion } from 'framer-motion';
 import { Video, BookOpen, MessageSquare, PenTool, Calculator, FileText, Bot, ShieldAlert, Map, LayoutDashboard, LogOut, User as UserIcon, Zap } from 'lucide-react';
 
 import ErrorBoundary from './components/ErrorBoundary';
@@ -34,36 +35,104 @@ const Dashboard = () => {
   console.log("Dashboard component rendered");
   const { user } = useAuth();
   return (
-    <div className="p-10 lg:p-16">
-      <div className="mb-12">
-        <div className="glass-pill mb-4 w-fit">Academic Command Center</div>
-        <h1 className="text-5xl lg:text-6xl font-black text-accent tracking-tighter leading-none">
-          Welcome, <span className="text-primary italic">{user?.username}!</span>
-        </h1>
-        <p className="mt-6 text-xl text-gray-400 font-medium max-w-2xl">
-          Your multimodal learning engines are primed and ready. What will you master today?
-        </p>
+    <div className="p-8 lg:p-16 bg-[#FAFBFF] min-h-screen">
+      <div className="mb-16">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="glass-pill mb-6 w-fit bg-primary/10 text-primary border-primary/20"
+        >
+          Academic Command Center
+        </motion.div>
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-5xl lg:text-7xl font-black text-accent tracking-tight leading-none mb-6"
+        >
+          Welcome, <span className="text-primary italic">{user?.username || 'Learner'}!</span>
+        </motion.h1>
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-xl text-gray-500 font-medium max-w-3xl leading-relaxed"
+        >
+          Your multimodal learning engines are synchronized. Access your specialized AI tools below to accelerate your academic journey.
+        </motion.p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {[
-          { to: "/features/video-summarizer", icon: <Video />, title: "Video Summarizer", desc: "Transcribe and extract key insights from lectures." },
-          { to: "/features/quiz-generator", icon: <BookOpen />, title: "Quiz Generator", desc: "Generate smart assessments from any document." },
-          { to: "/features/handwriting-recognition", icon: <PenTool />, title: "Handwriting OCR", desc: "Digitize your handwritten notes with 4K precision." },
-          { to: "/features/math-solver", icon: <Calculator />, title: "Math Solver", desc: "Step-by-step LaTeX solutions for equations." },
-          { to: "/features/virtual-tutor", icon: <Bot />, title: "Virtual Tutor", desc: "24/7 world-class academic assistance." }
+          { to: "/features/video-summarizer", icon: <Video />, title: "Video Summarizer", image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=800&q=80", gradient: "from-violet-700/80 via-violet-500/40 to-transparent", accent: "#7C3AED", badge: "Most Popular", bullets: ["Auto timestamped notes", "Multi-language support", "Export to PDF"], desc: "Transform any YouTube lecture or video into crisp, structured notes in seconds." },
+          { to: "/features/quiz-generator", icon: <BookOpen />, title: "Quiz Generator", image: "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?auto=format&fit=crop&w=800&q=80", gradient: "from-sky-700/80 via-sky-500/40 to-transparent", accent: "#0EA5E9", badge: "AI Powered", bullets: ["MCQ & open-ended", "Difficulty scaling", "Instant grading"], desc: "Upload PDFs or notes and get intelligent, curriculum-aligned quizzes instantly." },
+          { to: "/features/handwriting-recognition", icon: <PenTool />, title: "Handwriting OCR", image: "https://images.unsplash.com/photo-1503551723145-6c040742065b?auto=format&fit=crop&w=800&q=80", gradient: "from-orange-700/80 via-orange-500/40 to-transparent", accent: "#F97316", badge: "Precision OCR", bullets: ["Scan any handwriting", "Edit & export", "98% accuracy"], desc: "Seamlessly digitize paper-based notes into high-fidelity editable text." },
+          { to: "/features/math-solver", icon: <Calculator />, title: "Math Solver", image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=800&q=80", gradient: "from-emerald-700/80 via-emerald-500/40 to-transparent", accent: "#10B981", badge: "Step-by-Step", bullets: ["LaTeX rendering", "Graph visualizer", "All difficulty levels"], desc: "Solve complex equations with detailed step-by-step LaTeX explanations." },
+          { to: "/features/virtual-tutor", icon: <Bot />, title: "Virtual Tutor", image: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?auto=format&fit=crop&w=800&q=80", gradient: "from-amber-700/80 via-amber-500/40 to-transparent", accent: "#F59E0B", badge: "24/7 Available", bullets: ["Context-aware chat", "Subject expert mode", "Study plan builder"], desc: "An intelligent AI companion for deep-dives into any academic subject area." }
         ].map((item, idx) => (
-          <Link
+          <motion.div
             key={idx}
-            to={item.to}
-            className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 transition-all group"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -10, transition: { duration: 0.25 } }}
+            className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-md hover:shadow-2xl hover:shadow-primary/10 transition-shadow flex flex-col"
           >
-            <div className="w-16 h-16 bg-primary/5 rounded-[1.5rem] flex items-center justify-center text-primary mb-8 group-hover:bg-primary group-hover:text-white transition-all">
-              {React.cloneElement(item.icon, { className: "w-8 h-8" })}
+            {/* Image */}
+            <div className="relative h-52 overflow-hidden flex-shrink-0">
+              <img
+                src={item.image}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                alt={item.title}
+              />
+              <div className={`absolute inset-0 bg-gradient-to-t ${item.gradient}`} />
+              {/* Badge */}
+              <div
+                className="absolute top-4 left-4 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest text-white shadow-lg"
+                style={{ backgroundColor: item.accent }}
+              >
+                {item.badge}
+              </div>
+              {/* Live indicator */}
+              <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/30 backdrop-blur-sm rounded-full px-2.5 py-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-white text-[10px] font-bold uppercase tracking-wider">Live</span>
+              </div>
+              {/* Icon */}
+              <div
+                className="absolute bottom-4 right-4 w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-xl border border-white/20"
+                style={{ backgroundColor: item.accent }}
+              >
+                {React.cloneElement(item.icon, { className: "w-5 h-5" })}
+              </div>
             </div>
-            <h3 className="text-2xl font-black mb-4 text-accent tracking-tight">{item.title}</h3>
-            <p className="text-gray-400 font-medium leading-tight">{item.desc}</p>
-          </Link>
+
+            {/* Body */}
+            <div className="p-6 flex flex-col flex-1">
+              <h3 className="text-xl font-black text-accent mb-2 leading-tight">{item.title}</h3>
+              <p className="text-sm text-gray-500 font-medium leading-relaxed mb-4">{item.desc}</p>
+
+              {/* Bullets */}
+              <ul className="space-y-1.5 mb-5">
+                {item.bullets.map((b, bi) => (
+                  <li key={bi} className="flex items-center gap-2 text-xs font-bold text-gray-600">
+                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.accent }} />
+                    {b}
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA */}
+              <Link
+                to={item.to}
+                className="mt-auto flex items-center justify-between w-full px-5 py-3 rounded-2xl font-bold text-sm text-white transition-all hover:opacity-90 active:scale-95 shadow-lg"
+                style={{ backgroundColor: item.accent }}
+              >
+                Launch Engine
+                <Zap className="w-4 h-4 fill-white" />
+              </Link>
+            </div>
+          </motion.div>
         ))}
       </div>
     </div>
@@ -83,17 +152,16 @@ const ProtectedRoute = ({ children }) => {
   if (!isAuthenticated) return <Navigate to="/login" />;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col overflow-x-hidden">
       <Navbar />
-      <main className="bg-white m-4 rounded-3xl shadow-lg min-h-[calc(100vh-120px)] border border-gray-100 overflow-hidden">
+      <div className="flex-1 bg-white overflow-x-hidden">
         {children}
-      </main>
+      </div>
     </div>
   );
 };
 
 function App() {
-  console.log("App component rendered");
   return (
     <AuthProvider>
       <ErrorBoundary>
@@ -106,7 +174,6 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/about" element={<About />} />
-              <Route path="/test-math" element={<MathSolver />} />
 
               {/* Protected Routes */}
               <Route path="/dashboard" element={

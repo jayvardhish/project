@@ -1,84 +1,136 @@
 import os
-import cv2
-import yt_dlp
-from moviepy import VideoFileClip
-import speech_recognition as sr
+# Dynamic utility imports are handled inside functions to avoid startup crashes on Windows
 from ai_client import client
+
+def get_video_metadata_api(video_id):
+    """
+    Fetches video metadata (title, snippet) using official YouTube Data API v3.
+    """
+    try:
+        from googleapiclient.discovery import build
+        api_key = os.getenv("YOUTUBE_API_KEY")
+        if not api_key:
+            return None
+            
+        youtube = build("youtube", "v3", developerKey=api_key)
+        request = youtube.videos().list(
+            part="snippet,contentDetails",
+            id=video_id
+        )
+        response = request.execute()
+        
+        if response.get("items"):
+            item = response["items"][0]
+            snippet = item["snippet"]
+            return {
+                "title": snippet.get("title"),
+                "description": snippet.get("description"),
+                "thumbnail": snippet.get("thumbnails", {}).get("high", {}).get("url"),
+                "duration": item.get("contentDetails", {}).get("duration")
+            }
+        return None
+    except Exception as e:
+        print(f"YouTube API Metadata Error: {e}")
+        return None
+
+def get_video_metadata(video_url):
+    """
+    Fetches video metadata using yt-dlp (Fallback).
+    """
+    import yt_dlp
+    try:
+        ydl_opts = {
+            'quiet': True,
+            'no_warnings': True,
+            'extract_flat': True,
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            return ydl.extract_info(video_url, download=False)
+    except Exception as e:
+        print(f"yt-dlp Metadata Error: {e}")
+        return {}
 
 def download_youtube_audio(video_url, output_path_base):
     """
-    Downloads raw audio from a YouTube video. 
+    Downloads raw audio from a YouTube video without requiring FFmpeg.
     Returns the actual path of the downloaded file.
     """
+    import yt_dlp
     try:
         ydl_opts = {
             'format': 'bestaudio/best',
-            'outtmpl': output_path_base + '.%(ext)s', # Let yt-dlp append the extension
+            'outtmpl': output_path_base + '.%(ext)s',
             'quiet': True,
             'no_warnings': True,
-            'nopostprocess': True,
+            'referer': 'https://www.youtube.com/',
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            # Removed postprocessors as they require FFmpeg
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            # We first extract info to get the extension
             info = ydl.extract_info(video_url, download=True)
             ext = info.get('ext', 'm4a')
             actual_path = f"{output_path_base}.{ext}"
+            
+            # Check if the file exists (yt-dlp might use a different name sometimes)
+            if not os.path.exists(actual_path):
+                # Fallback: search for any file starting with output_path_base
+                dirname = os.path.dirname(output_path_base)
+                basename = os.path.basename(output_path_base)
+                for f in os.listdir(dirname):
+                    if f.startswith(basename):
+                        return os.path.join(dirname, f)
+            
             return actual_path
     except Exception as e:
         print(f"YouTube Audio Download Error: {e}")
         return None
 
-def transcribe_audio_with_deepseek(audio_path):
+def transcribe_audio_whisper(audio_path):
     """
-    Transcribe audio using local speech recognition + DeepSeek for cleanup.
-    This is a free alternative to OpenAI Whisper.
+    Transcribe audio using Groq's Whisper API (supports m4a, webm, mp4, wav, etc.)
+    Falls back to a basic speech_recognition attempt if Groq is unavailable.
     """
+    return transcribe_with_groq_whisper(audio_path)
+
+def transcribe_with_groq_whisper(audio_path):
+    """
+    Uses Groq's Whisper-large-v3-turbo for fast, accurate audio transcription.
+    Accepts any format that yt-dlp downloads (m4a, webm, mp4, etc.)
+    """
+    import os
+    from openai import OpenAI
+
+    groq_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not groq_key:
+        print("⚠️  No GROQ_API_KEY — skipping Whisper transcription.")
+        return None
+
     try:
-        # Use SpeechRecognition with Google's free API for initial transcription
-        recognizer = sr.Recognizer()
-        
-        # Convert to WAV if needed (SpeechRecognition works best with WAV)
-        wav_path = audio_path.replace('.m4a', '.wav').replace('.mp3', '.wav')
-        
-        if not wav_path.endswith('.wav'):
-            from pydub import AudioSegment
-            audio = AudioSegment.from_file(audio_path)
-            audio.export(wav_path, format='wav')
-        
-        # Transcribe using Google Speech Recognition (free)
-        with sr.AudioFile(wav_path) as source:
-            audio_data = recognizer.record(source)
-            raw_text = recognizer.recognize_google(audio_data)
-        
-        # If we got this far, we have a basic transcription
-        # Now use DeepSeek to clean it up and add punctuation
-        if client:
-            response = client.chat.completions.create(
-                model="deepseek/deepseek-chat",
-                messages=[
-                    {"role": "system", "content": "You are a professional transcription editor. Clean up the following transcription by adding proper punctuation, capitalization, and formatting. Keep the exact words but make it readable."},
-                    {"role": "user", "content": raw_text}
-                ],
-                max_tokens=client.default_max_tokens
+        print(f"🎙️  [Groq Whisper] Transcribing: {os.path.basename(audio_path)}")
+        groq_client = OpenAI(
+            api_key=groq_key,
+            base_url="https://api.groq.com/openai/v1"
+        )
+        with open(audio_path, "rb") as audio_file:
+            transcription = groq_client.audio.transcriptions.create(
+                model="whisper-large-v3-turbo",
+                file=audio_file,
+                response_format="text"
             )
-            cleaned_text = response.choices[0].message.content.strip()
-            
-            # Cleanup temp WAV file
-            if wav_path != audio_path and os.path.exists(wav_path):
-                os.remove(wav_path)
-                
-            return cleaned_text
-        else:
-            return raw_text
-            
+        text = transcription if isinstance(transcription, str) else transcription.text
+        print(f"✅ Groq Whisper transcription complete ({len(text)} chars).")
+        return text.strip()
     except Exception as e:
-        print(f"DeepSeek Transcription Error: {e}")
+        print(f"❌ Groq Whisper Error: {e}")
         return None
 
 def extract_audio(video_path, output_audio_path):
     """
     Extracts audio from a video file and saves it to output_audio_path.
     """
+    from moviepy import VideoFileClip
     try:
         if not os.path.exists(video_path):
             print(f"Video file not found: {video_path}")
@@ -104,6 +156,7 @@ def extract_frames(video_path, output_folder, interval=10):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     
+    import cv2
     frame_paths = []
     try:
         cap = cv2.VideoCapture(video_path)

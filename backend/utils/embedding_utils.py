@@ -25,6 +25,8 @@ def chunk_text(text: str, max_tokens: int = 1000, overlap: int = 100) -> List[di
     tokens = encoding.encode(text)
     chunks = []
     
+    # Ensure overlap is less than chunk size to prevent infinite loops
+    overlap = min(overlap, max_tokens - 1)
     start = 0
     chunk_id = 0
     

@@ -29,21 +29,21 @@ async def send_message(
     messages.append({"role": "user", "content": message})
 
     try:
-        response = client.chat.completions.create(
-            model="deepseek/deepseek-chat",
-            messages=messages,
-            max_tokens=client.default_max_tokens
-        )
-        
-        reply = response.choices[0].message.content
-        
-        # Save user message
+        # Save user message FIRST to prevent loss if AI fails
         await db.chat_history.insert_one({
             "user_id": current_user.id,
             "role": "user",
             "content": message,
             "timestamp": datetime.utcnow()
         })
+
+        response = client.chat.completions.create(
+            model=getattr(client, "model_name", "deepseek-chat"),
+            messages=messages,
+            max_tokens=client.default_max_tokens
+        )
+        
+        reply = response.choices[0].message.content
         
         # Save assistant reply
         await db.chat_history.insert_one({

@@ -37,9 +37,25 @@ async def perform_vision_ocr(content: bytes, mime_type: str, mode: str) -> str:
         system_prompt = "You are an accurate OCR system for handwritten text."
         user_prompt = "Please accurately transcribe all handwritten text in this image. Do not add any commentary. Output ONLY the text found."
 
+    # Determine vision model based on engine
+    vision_model = "google/gemini-2.0-flash-001"
+    if getattr(client, "is_fallback", False):
+        vision_model = "gpt-4o-mini"
+    elif not getattr(client, "is_openrouter", False):
+        # If it's direct DeepSeek, they don't have vision in 'deepseek-chat'
+        # We must fallback to OpenAI if possible
+        from ai_client import openai_client
+        if openai_client:
+            vision_model = "gpt-4o-mini"
+            vision_client = openai_client
+        else:
+            return "" # Cannot do vision with direct DeepSeek 'deepseek-chat'
+    else:
+        vision_client = client
+
     try:
-        response = client.chat.completions.create(
-            model="google/gemini-2.0-flash-001", 
+        response = vision_client.chat.completions.create(
+            model=vision_model, 
             messages=[
                 {"role": "system", "content": system_prompt},
                 {
@@ -53,7 +69,7 @@ async def perform_vision_ocr(content: bytes, mime_type: str, mode: str) -> str:
                     ]
                 }
             ],
-            max_tokens=client.default_max_tokens
+            max_tokens=getattr(vision_client, "default_max_tokens", 2000)
         )
         return response.choices[0].message.content.strip()
     except Exception as e:

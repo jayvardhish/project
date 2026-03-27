@@ -1,3 +1,4 @@
+import certifi
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from dotenv import load_dotenv
@@ -12,10 +13,12 @@ if not MONGODB_URI:
 
 DATABASE_NAME = os.getenv("DATABASE_NAME", "smart_learning_platform")
 
+# Add TLS CA file explicitly for Windows compatibility with Atlas
 try:
-    client = AsyncIOMotorClient(MONGODB_URI)
+    client = AsyncIOMotorClient(MONGODB_URI, tlsCAFile=certifi.where())
     db = client[DATABASE_NAME]
-    print(f"Connected to MongoDB at {MONGODB_URI.split('@')[-1] if '@' in MONGODB_URI else 'localhost'}")
+    display_uri = MONGODB_URI.split('@')[-1] if '@' in MONGODB_URI else 'localhost'
+    print(f"Connected to MongoDB at {display_uri}")
 except Exception as e:
     print(f"Database Connection Error: {e}")
     client = None

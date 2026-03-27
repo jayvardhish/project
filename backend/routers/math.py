@@ -37,7 +37,7 @@ async def refine_math_ocr(raw_text: str) -> str:
     
     try:
         response = client.chat.completions.create(
-            model="deepseek/deepseek-chat",
+            model=getattr(client, "model_name", "deepseek-chat"),
             messages=[{"role": "user", "content": prompt}],
             max_tokens=300
         )
@@ -66,7 +66,7 @@ async def get_pro_solution(expression: str) -> str:
     
     try:
         response = client.chat.completions.create(
-            model="deepseek/deepseek-chat",
+            model=getattr(client, "model_name", "deepseek-chat"),
             messages=[
                 {"role": "system", "content": "You are a professional mathematician and tutor. You provide clear, rigorous, and easy-to-understand solutions."},
                 {"role": "user", "content": prompt}

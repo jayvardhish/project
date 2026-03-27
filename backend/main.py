@@ -1,22 +1,14 @@
 import uvicorn
 import os
 from dotenv import load_dotenv
-# Load env before ANY other imports
+
+# Load environment variables at the very beginning
 load_dotenv()
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import os
-from dotenv import load_dotenv
-
-# Load environment variables first
-load_dotenv()
-
 from routers import auth, videos, quizzes, ocr, math, chat, vdo_ocr
 from database import close_db
-
-# Load environment variables
-load_dotenv()
 
 app = FastAPI(title="Smart Multimodal Learning Platform API")
 

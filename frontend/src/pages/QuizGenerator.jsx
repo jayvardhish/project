@@ -60,189 +60,262 @@ const QuizGenerator = () => {
     };
 
     return (
-        <div className="p-8 max-w-5xl mx-auto">
-            <div className="mb-12">
-                <h1 className="text-4xl font-bold text-accent mb-4">AI Quiz Generator</h1>
-                <p className="text-gray-500">Transform your study materials into interactive assessment modules instantly.</p>
-            </div>
-
-            <AnimatePresence mode="wait">
-                {currentStep === 1 && (
-                    <motion.div
-                        key="step1"
-                        initial={{ opacity: 0, x: 20 }}
+        <div className="min-h-screen bg-[#FAFBFF] p-6 lg:p-12">
+            <div className="max-w-6xl mx-auto">
+                {/* Header Section */}
+                <div className="mb-16 text-center lg:text-left">
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        className="space-y-8"
+                        className="glass-pill mb-6 w-fit mx-auto lg:mx-0"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-4">
-                                <label className="text-lg font-bold flex items-center">
-                                    <FileText className="w-5 h-5 mr-2 text-primary" /> Paste Text Content
-                                </label>
-                                <textarea
-                                    value={content}
-                                    onChange={(e) => setContent(e.target.value)}
-                                    placeholder="Paste article, lecture notes, or any text here..."
-                                    className="w-full h-80 p-6 border border-gray-100 rounded-3xl focus:ring-2 focus:ring-primary outline-none resize-none shadow-sm"
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <label className="text-lg font-bold flex items-center">
-                                    <Upload className="w-5 h-5 mr-2 text-primary" /> Or Upload Document
-                                </label>
-                                <div className="h-80 border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center bg-gray-50 hover:bg-white hover:border-primary transition-all group">
-                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-primary mb-6 shadow-sm group-hover:scale-110 transition-transform">
-                                        <Upload className="w-8 h-8" />
-                                    </div>
-                                    <input type="file" onChange={handleFileChange} id="doc-upload" className="hidden" accept=".pdf,.txt" />
-                                    <label htmlFor="doc-upload" className="cursor-pointer px-6 py-2 bg-white text-accent font-semibold rounded-lg shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">
-                                        {file ? file.name : "Choose File"}
-                                    </label>
-                                    <p className="mt-4 text-xs text-gray-400">PDF or Text files preferred.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-center">
-                            <button
-                                onClick={generateQuiz}
-                                className="btn-primary w-full md:w-fit px-12 py-4 flex items-center justify-center text-lg"
-                            >
-                                Generate Quiz <Brain className="ml-2 w-6 h-6" />
-                            </button>
-                        </div>
+                        Intelligence Assessment Hub
                     </motion.div>
-                )}
-
-                {currentStep === 2 && (
-                    <motion.div
-                        key="step2"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex flex-col items-center justify-center py-24 text-center"
-                    >
-                        <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin mb-8"></div>
-                        <h2 className="text-3xl font-bold text-accent mb-4">Generating Your Quiz...</h2>
-                        <p className="text-gray-500 max-w-md">Our AI is analyzing the content and crafting challenging questions to test your knowledge.</p>
-                    </motion.div>
-                )}
-
-                {currentStep === 3 && (
-                    <motion.div
-                        key="step3"
+                    <motion.h1 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="space-y-12 pb-24"
+                        transition={{ delay: 0.1 }}
+                        className="text-4xl lg:text-5xl font-black text-accent tracking-tighter leading-none mb-6"
                     >
-                        <div className="flex items-center justify-between sticky top-20 bg-white/80 backdrop-blur-md py-4 z-10 border-b border-gray-50 px-4 -mx-4">
-                            <h2 className="text-2xl font-bold text-accent">{quiz.title}</h2>
-                            <span className="bg-secondary text-primary px-4 py-1 rounded-full font-bold text-sm">
-                                {quiz.questions.length} Questions
-                            </span>
-                        </div>
+                        Quiz <span className="text-primary italic text-glow">Architect</span>
+                    </motion.h1>
+                    <motion.p 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-xl text-gray-500 font-medium max-w-3xl leading-relaxed"
+                    >
+                        Transform static text and documents into dynamic, AI-powered diagnostic assessments designed for deep cognitive mapping.
+                    </motion.p>
+                </div>
 
-                        <div className="space-y-8">
-                            {quiz.questions.map((q, idx) => (
-                                <div key={idx} className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
-                                    <div className="flex items-start mb-6">
-                                        <span className="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center font-bold text-sm mr-4 mt-1 flex-shrink-0">
-                                            {idx + 1}
-                                        </span>
-                                        <h3 className="text-xl font-bold text-accent leading-tight">{q.question}</h3>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-12">
-                                        {q.options.map((option, oIdx) => (
-                                            <button
-                                                key={oIdx}
-                                                onClick={() => handleAnswerSelect(idx, option)}
-                                                className={`p-4 text-left rounded-2xl border transition-all ${userAnswers[idx] === option
-                                                    ? 'border-primary bg-secondary/20 text-primary font-bold shadow-md'
-                                                    : 'border-gray-100 hover:border-primary-light hover:bg-gray-50 text-gray-700'
-                                                    }`}
-                                            >
-                                                {option}
-                                            </button>
-                                        ))}
+                <AnimatePresence mode="wait">
+                    {currentStep === 1 && (
+                        <motion.div
+                            key="step1"
+                            initial={{ opacity: 0, scale: 0.98 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.98 }}
+                            className="space-y-12"
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-6">
+                                    <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                                        Source Knowledge Input
+                                    </h3>
+                                    <div className="relative group">
+                                        <textarea
+                                            value={content}
+                                            onChange={(e) => setContent(e.target.value)}
+                                            placeholder="Paste lecture logs, research papers, or study notes here..."
+                                            className="w-full h-[400px] p-8 bg-white border border-gray-100 rounded-[3rem] focus:ring-4 focus:ring-primary/10 outline-none resize-none shadow-2xl shadow-primary/5 font-bold text-gray-700 transition-all placeholder:text-gray-200"
+                                        />
+                                        <FileText className="absolute bottom-10 right-10 w-8 h-8 text-gray-100 group-focus-within:text-primary transition-colors" />
                                     </div>
                                 </div>
-                            ))}
-                        </div>
 
-                        <div className="flex justify-center">
-                            <button
-                                onClick={() => {
-                                    if (Object.keys(userAnswers).length < quiz.questions.length) {
-                                        return alert("Please answer all questions before submitting.");
-                                    }
-                                    setCurrentStep(4);
-                                    setShowResults(true);
-                                }}
-                                className="btn-primary px-12 py-4 text-lg shadow-xl"
-                            >
-                                Submit Answers <ArrowRight className="ml-2 w-5 h-5" />
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
-
-                {currentStep === 4 && (
-                    <motion.div
-                        key="step4"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="space-y-12"
-                    >
-                        <div className="purple-gradient text-white rounded-3xl p-12 text-center shadow-xl relative overflow-hidden">
-                            <div className="relative z-10">
-                                <Trophy className="w-20 h-20 mx-auto mb-6 text-yellow-300" />
-                                <h2 className="text-5xl font-bold mb-2">Quiz Results</h2>
-                                <p className="text-2xl text-purple-100 mb-8">You scored <span className="text-white bg-white/30 px-3 py-1 rounded-lg">{calculateScore()} / {quiz.questions.length}</span></p>
-                                <div className="flex gap-4 justify-center">
-                                    <button onClick={() => { setCurrentStep(1); setQuiz(null); setUserAnswers({}); }} className="bg-white text-primary px-8 py-3 rounded-xl font-bold hover:bg-white/90 transition-all">
-                                        New Quiz
-                                    </button>
-                                    <button onClick={shuffleQuestions} className="bg-white/20 text-white border-2 border-white px-8 py-3 rounded-xl font-bold hover:bg-white/30 transition-all">
-                                        Shuffle & Retry
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                                {/* Decorative dots or patterns */}
-                            </div>
-                        </div>
-
-                        <div className="space-y-6">
-                            <h3 className="text-2xl font-bold px-4">Detailed Review</h3>
-                            {quiz.questions.map((q, idx) => (
-                                <div key={idx} className={`p-8 rounded-3xl border ${userAnswers[idx] === q.correct_answer ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
-                                    <div className="flex items-start mb-4">
-                                        {userAnswers[idx] === q.correct_answer ? <CheckCircle2 className="w-6 h-6 text-green-500 mr-4 mt-1" /> : <XCircle className="w-6 h-6 text-red-500 mr-4 mt-1" />}
-                                        <h4 className="text-lg font-bold">{q.question}</h4>
-                                    </div>
-                                    <div className="ml-10 space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="p-3 bg-white rounded-lg border border-gray-100">
-                                                <p className="text-xs text-gray-400 font-bold uppercase mb-1">Your Answer</p>
-                                                <p className={userAnswers[idx] === q.correct_answer ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>{userAnswers[idx]}</p>
-                                            </div>
-                                            <div className="p-3 bg-white rounded-lg border border-gray-100">
-                                                <p className="text-xs text-gray-400 font-bold uppercase mb-1">Correct Answer</p>
-                                                <p className="text-green-600 font-semibold">{q.correct_answer}</p>
-                                            </div>
+                                <div className="space-y-6">
+                                    <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-violet-400"></div>
+                                        Multimodal Document Scan
+                                    </h3>
+                                    <div className="h-[400px] bg-white border border-gray-100 rounded-[3rem] p-10 flex flex-col items-center justify-center shadow-2xl shadow-primary/5 hover:shadow-primary/10 group transition-all relative overflow-hidden group">
+                                        <input type="file" onChange={handleFileChange} id="doc-upload" className="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf,.txt" />
+                                        <div className="w-24 h-24 bg-primary/5 rounded-[2.5rem] flex items-center justify-center text-primary mb-10 group-hover:bg-primary group-hover:text-white transition-all transform group-hover:rotate-12 duration-500">
+                                            <Upload className="w-10 h-10" />
                                         </div>
-                                        <div className="p-4 bg-white/50 rounded-xl border border-white/50 flex items-start">
-                                            <Info className="w-5 h-5 text-primary mr-3 mt-0.5" />
-                                            <p className="text-sm text-gray-600 italic leading-relaxed">{q.explanation}</p>
+                                        <p className="text-2xl font-black text-accent mb-2">
+                                            {file ? file.name : "Drop Source Matrix"}
+                                        </p>
+                                        <p className="text-gray-400 font-medium italic">Standard PDF/TXT protocols supported</p>
+                                        
+                                        <div className="mt-10 flex gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-primary/20"></div>
+                                            <div className="w-2 h-2 rounded-full bg-primary/20"></div>
+                                            <div className="w-2 h-2 rounded-full bg-primary"></div>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            </div>
+
+                            <div className="flex justify-center pt-8">
+                                <button
+                                    onClick={generateQuiz}
+                                    className="btn-primary px-16 py-6 text-xl rounded-[2.5rem] group shadow-2xl shadow-primary/40 active:scale-95"
+                                >
+                                    Initialize Generation Protocol
+                                    <Brain className="ml-4 w-7 h-7 group-hover:scale-125 transition-transform" />
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {currentStep === 2 && (
+                        <motion.div
+                            key="step2"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex flex-col items-center justify-center py-40 text-center"
+                        >
+                            <div className="relative mb-12">
+                                <motion.div
+                                    animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+                                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                                    className="w-40 h-40 border-[16px] border-primary/10 border-t-primary rounded-full shadow-[0_0_50px_rgba(124,58,237,0.2)]"
+                                />
+                                <Brain className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 text-primary" />
+                            </div>
+                            <h2 className="text-5xl font-black text-accent mb-6 leading-none">Mapping Neural Nodes</h2>
+                            <p className="text-gray-400 max-w-lg text-xl font-medium leading-relaxed italic">
+                                Sequencing assessment modules from provided source material using high-speed reasoning engines...
+                            </p>
+                        </motion.div>
+                    )}
+
+                    {currentStep === 3 && (
+                        <motion.div
+                            key="step3"
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-16 pb-40"
+                        >
+                            <div className="sticky top-24 bg-white/80 backdrop-blur-2xl py-8 px-10 z-20 border-b border-gray-100 -mx-10 rounded-b-[3rem] shadow-sm flex items-center justify-between">
+                                <div className="flex items-center gap-6">
+                                    <div className="w-14 h-14 bg-accent text-white rounded-2xl flex items-center justify-center shadow-lg">
+                                        <BookOpen className="w-7 h-7" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-3xl font-black text-accent tracking-tighter leading-none">{quiz.title}</h2>
+                                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mt-2 italic">Active Assessment Sequence</p>
+                                    </div>
+                                </div>
+                                <span className="bg-primary/10 text-primary border border-primary/20 px-6 py-2 rounded-full font-black text-xs uppercase tracking-widest">
+                                    {quiz.questions.length} Diagnostic Pairs
+                                </span>
+                            </div>
+
+                            <div className="space-y-12">
+                                {quiz.questions.map((q, idx) => (
+                                    <motion.div 
+                                        key={idx}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.1 }}
+                                        className="bg-white border border-gray-50 rounded-[4rem] p-12 shadow-2xl shadow-primary/5 hover:border-primary/20 transition-colors"
+                                    >
+                                        <div className="flex items-start mb-10">
+                                            <span className="w-12 h-12 bg-primary/5 text-primary rounded-2xl flex items-center justify-center font-black text-lg mr-6 mt-1 flex-shrink-0 border border-primary/10">
+                                                {idx + 1}
+                                            </span>
+                                            <h3 className="text-3xl font-black text-accent leading-tight tracking-tight pt-2">{q.question}</h3>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-0 md:pl-20">
+                                            {q.options.map((option, oIdx) => (
+                                                <button
+                                                    key={oIdx}
+                                                    onClick={() => handleAnswerSelect(idx, option)}
+                                                    className={`p-6 text-left rounded-[2rem] border-2 transition-all group ${userAnswers[idx] === option
+                                                        ? 'border-primary bg-primary/5 text-primary font-black shadow-xl shadow-primary/10'
+                                                        : 'border-gray-50 hover:border-primary/40 hover:bg-white text-gray-600 font-bold'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={`w-3 h-3 rounded-full transition-colors ${userAnswers[idx] === option ? 'bg-primary' : 'bg-gray-100'}`}></div>
+                                                        {option}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            <div className="flex justify-center pt-10">
+                                <button
+                                    onClick={() => {
+                                        if (Object.keys(userAnswers).length < quiz.questions.length) {
+                                            return alert("Please resolve all diagnostic pairs before submission.");
+                                        }
+                                        setCurrentStep(4);
+                                        setShowResults(true);
+                                    }}
+                                    className="btn-primary px-20 py-8 rounded-[3rem] text-2xl group shadow-2xl shadow-primary/30 active:scale-95"
+                                >
+                                    Push Analysis to Core
+                                    <ArrowRight className="ml-4 w-8 h-8 group-hover:translate-x-3 transition-transform" />
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {currentStep === 4 && (
+                        <motion.div
+                            key="step4"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="space-y-16 pb-40"
+                        >
+                            <div className="purple-gradient text-white rounded-[4rem] p-24 text-center shadow-2xl relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+                                <div className="relative z-10">
+                                    <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 border border-white/30">
+                                        <Trophy className="w-12 h-12 text-yellow-300 fill-yellow-300" />
+                                    </div>
+                                    <h2 className="text-7xl font-black mb-4 tracking-tighter italic">Diagnostic Finalized</h2>
+                                    <p className="text-3xl text-purple-100 mb-12 font-medium">Cognitive Mapping: <span className="text-white font-black">{Math.round((calculateScore() / quiz.questions.length) * 100)}%</span> Efficiency</p>
+                                    <div className="flex gap-6 justify-center">
+                                        <button onClick={() => { setCurrentStep(1); setQuiz(null); setUserAnswers({}); }} className="bg-white text-primary px-12 py-5 rounded-[2rem] font-black text-xl hover:scale-105 transition-all shadow-2xl active:scale-95">
+                                            New Matrix
+                                        </button>
+                                        <button onClick={shuffleQuestions} className="bg-white/10 text-white border-2 border-white/50 backdrop-blur-md px-12 py-5 rounded-[2rem] font-black text-xl hover:bg-white/20 transition-all active:scale-95">
+                                            Rerender Sync
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-8">
+                                <h3 className="text-4xl font-black text-accent px-6 tracking-tighter">Detailed Analysis</h3>
+                                {quiz.questions.map((q, idx) => (
+                                    <motion.div 
+                                        key={idx} 
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: idx * 0.1 }}
+                                        className={`p-12 rounded-[3.5rem] border ${userAnswers[idx] === q.correct_answer ? 'bg-green-50/50 border-green-100 shadow-green-500/5' : 'bg-red-50/50 border-red-100 shadow-red-500/5'} shadow-2xl`}
+                                    >
+                                        <div className="flex items-start mb-10">
+                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mr-6 mt-1 flex-shrink-0 border shadow-sm ${userAnswers[idx] === q.correct_answer ? 'bg-white text-green-500 border-green-100' : 'bg-white text-red-500 border-red-100'}`}>
+                                                {userAnswers[idx] === q.correct_answer ? <CheckCircle2 className="w-7 h-7" /> : <XCircle className="w-7 h-7" />}
+                                            </div>
+                                            <h4 className="text-3xl font-black text-accent tracking-tight leading-tight pt-2">{q.question}</h4>
+                                        </div>
+                                        <div className="ml-18 pl-0 md:pl-4 space-y-8">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="p-6 bg-white/80 backdrop-blur-sm rounded-[2rem] border border-gray-100 shadow-sm">
+                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3">Submitted Outcome</p>
+                                                    <p className={`text-xl font-black ${userAnswers[idx] === q.correct_answer ? "text-green-600" : "text-red-500"}`}>{userAnswers[idx]}</p>
+                                                </div>
+                                                <div className="p-6 bg-white/80 backdrop-blur-sm rounded-[2rem] border border-gray-100 shadow-sm">
+                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3">Hashed Identity</p>
+                                                    <p className="text-xl font-black text-green-600">{q.correct_answer}</p>
+                                                </div>
+                                            </div>
+                                            <div className="p-8 bg-white/40 backdrop-blur-sm rounded-[2.5rem] border border-white shadow-inner flex items-start">
+                                                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0 mr-6">
+                                                    <Info className="w-6 h-6" />
+                                                </div>
+                                                <p className="text-gray-500 font-bold italic leading-relaxed text-lg">{q.explanation}</p>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 };

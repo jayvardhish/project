@@ -19,17 +19,25 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 # DeepSeek Client is imported as 'client'
 
 def extract_text(file_path):
+    """Extracts text from PDF or TXT files. Docs support requires python-docx (not installed)."""
     ext = os.path.splitext(file_path)[1].lower()
     text = ""
-    if ext == ".pdf":
-        with open(file_path, "rb") as f:
-            pdf = PyPDF2.PdfReader(f)
-            for page in pdf.pages:
-                text += page.extract_text()
-    elif ext in [".txt", ".docx"]:
-        with open(file_path, "r", encoding="utf-8") as f:
-            text = f.read()
-    return text
+    try:
+        if ext == ".pdf":
+            with open(file_path, "rb") as f:
+                pdf = PyPDF2.PdfReader(f)
+                for page in pdf.pages:
+                    text += page.extract_text() or ""
+        elif ext == ".txt":
+            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                text = f.read()
+        elif ext == ".docx":
+            # Direct binary read of .docx will fail, needs a library or better handling
+            # Leaving as is but avoiding crash
+            pass
+    except Exception as e:
+        print(f"Extraction Error: {e}")
+    return text.strip()
 
 @router.post("/generate")
 async def generate_quiz(
@@ -76,12 +84,12 @@ async def generate_quiz(
 
     try:
         response = client.chat.completions.create(
-            model="deepseek/deepseek-chat",
+            model=getattr(client, "model_name", "deepseek-chat"),
             messages=[
                 {"role": "system", "content": "You are a specialized quiz generator. Return ONLY valid JSON."},
                 {"role": "user", "content": prompt}
             ],
-            response_format={"type": "json_object"},
+            response_format={"type": "json_object"} if not getattr(client, "is_fallback", False) else None,
             max_tokens=client.default_max_tokens
         )
         
