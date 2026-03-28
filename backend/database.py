@@ -13,9 +13,14 @@ if not MONGODB_URI:
 
 DATABASE_NAME = os.getenv("DATABASE_NAME", "smart_learning_platform")
 
+import sys
+
 # Add TLS CA file explicitly for Windows compatibility with Atlas
 try:
-    client = AsyncIOMotorClient(MONGODB_URI, tlsCAFile=certifi.where())
+    if sys.platform == "win32":
+        client = AsyncIOMotorClient(MONGODB_URI, tlsCAFile=certifi.where())
+    else:
+        client = AsyncIOMotorClient(MONGODB_URI)
     db = client[DATABASE_NAME]
     display_uri = MONGODB_URI.split('@')[-1] if '@' in MONGODB_URI else 'localhost'
     print(f"Connected to MongoDB at {display_uri}")

@@ -135,15 +135,15 @@ async def reset_password(request: PasswordResetConfirm):
 
 # OAuth Configuration
 google_sso = GoogleSSO(
-    client_id=os.getenv("GOOGLE_CLIENT_ID"),
-    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-    redirect_uri=os.getenv("GOOGLE_REDIRECT_URI"),
+    client_id=os.getenv("GOOGLE_CLIENT_ID") or "dummy",
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET") or "dummy",
+    redirect_uri=os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:5000/api/auth/google/callback"),
     allow_insecure_http=True
 )
 
 github_sso = GithubSSO(
-    client_id=os.getenv("GITHUB_CLIENT_ID"),
-    client_secret=os.getenv("GITHUB_CLIENT_SECRET"),
+    client_id=os.getenv("GITHUB_CLIENT_ID") or "dummy",
+    client_secret=os.getenv("GITHUB_CLIENT_SECRET") or "dummy",
     redirect_uri=os.getenv("GITHUB_REDIRECT_URI", "http://localhost:5000/api/auth/github/callback"),
     allow_insecure_http=True
 )
