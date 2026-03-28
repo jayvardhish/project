@@ -16,6 +16,8 @@ from bson import ObjectId
 import asyncio
 import json
 import re
+from utils.cloudinary_utils import upload_file_to_cloudinary
+from utils.file_manager import ensure_local_file, cleanup_local_file
 
 router = APIRouter(prefix="/api/videos", tags=["Videos"])
 
@@ -261,18 +263,17 @@ async def upload_video(
     if not file.content_type.startswith("video/"):
         raise HTTPException(status_code=400, detail="File must be a video")
     
-    file_id = str(uuid.uuid4())
-    file_ext = os.path.splitext(file.filename)[1]
-    file_path = f"{UPLOAD_DIR}/{file_id}{file_ext}"
-    
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # Upload to Cloudinary instead of local disk
+    try:
+        secure_url = upload_file_to_cloudinary(file, folder="videos", resource_type="video")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Cloudinary error: {str(e)}")
     
     db = await get_database()
     video_doc = {
         "user_id": current_user.id,
         "title": file.filename,
-        "file_path": file_path,
+        "file_path": secure_url, # Stores Cloudinary URL
         "status": "uploaded",
         "created_at": datetime.utcnow()
     }
@@ -281,7 +282,8 @@ async def upload_video(
     return {
         "id": str(result.inserted_id),
         "filename": file.filename,
-        "status": "uploaded"
+        "status": "uploaded",
+        "file_url": secure_url
     }
 
 @router.post("/youtube/languages")
@@ -404,15 +406,20 @@ async def summarize_local_video(
         raise HTTPException(status_code=404, detail="Video not found")
 
     video_path = video.get("file_path")
-    if not video_path or not os.path.exists(video_path):
+    if not video_path:
         raise HTTPException(status_code=400, detail="Video file missing on server")
+
+    # Download from Cloudinary if it's a URL
+    local_video_path = await ensure_local_file(video_path)
+    if not os.path.exists(local_video_path):
+        raise HTTPException(status_code=400, detail="Failed to retrieve video file for processing")
 
     audio_path = os.path.join(AUDIO_DIR, f"{video_id}.mp3")
     
     try:
         # 2. Transcription Pipeline
         if not os.path.exists(audio_path):
-            success = extract_audio(video_path, audio_path)
+            success = extract_audio(local_video_path, audio_path)
             if not success:
                 raise Exception("Failed to extract audio from video")
 
@@ -451,6 +458,8 @@ async def summarize_local_video(
     except Exception as e:
         print(f"Local Video Summary Error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to process video: {str(e)}")
+    finally:
+        cleanup_local_file(local_video_path)
 
 @router.post("/{video_id}/ask")
 async def ask_video_question(

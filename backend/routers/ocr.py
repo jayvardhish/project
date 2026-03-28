@@ -11,6 +11,8 @@ from routers.auth import get_current_user
 from models import UserResponse
 from ai_client import client
 from ocr_utils import get_reader
+from utils.cloudinary_utils import upload_file_to_cloudinary
+from utils.file_manager import ensure_local_file, cleanup_local_file
 
 router = APIRouter(prefix="/api/ocr", tags=["OCR"])
 
@@ -80,14 +82,18 @@ async def recognize_handwriting(
         raise HTTPException(status_code=400, detail="Only image files are supported for OCR.")
     
     file_id = str(uuid.uuid4())
-    file_ext = os.path.splitext(file.filename)[1]
-    file_path = os.path.join(UPLOAD_DIR, f"{file_id}{file_ext}")
     
-    # 1. Read & Save File
+    # 1. Read File for Vision OCR
     content = await file.read()
-    with open(file_path, "wb") as buffer:
-        buffer.write(content)
+    await file.seek(0)
     
+    # Upload to Cloudinary
+    try:
+        secure_url = upload_file_to_cloudinary(file, folder="ocr", resource_type="image")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Cloudinary error: {str(e)}")
+    
+    local_temp_path = None
     try:
         # 2. Try High-Fidelity Vision OCR first
         text = await perform_vision_ocr(content, file.content_type, mode)
@@ -95,8 +101,9 @@ async def recognize_handwriting(
         # 3. Fallback to Local OCR if Vision fails or returns empty
         if not text:
             print("OCR Detail: Vision failed or returned empty. Falling back to local EasyOCR.")
+            local_temp_path = await ensure_local_file(secure_url)
             reader = get_reader()
-            results = reader.readtext(file_path)
+            results = reader.readtext(local_temp_path)
             text = " ".join([res[1] for res in results])
         
         if not text:
@@ -109,7 +116,7 @@ async def recognize_handwriting(
             "user_id": current_user.id,
             "title": file.filename,
             "text": text,
-            "image_path": file_path,
+            "image_path": secure_url,
             "type": "handwriting",
             "mode": mode,
             "created_at": datetime.utcnow()
@@ -119,12 +126,16 @@ async def recognize_handwriting(
         return {
             "id": file_id,
             "text": text,
-            "mode": mode
+            "mode": mode,
+            "image_url": secure_url
         }
         
     except Exception as e:
         print(f"OCR Pipeline Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to process image OCR.")
+    finally:
+        if local_temp_path:
+            cleanup_local_file(local_temp_path)
 
 @router.get("/history")
 async def get_ocr_history(current_user: UserResponse = Depends(get_current_user)):

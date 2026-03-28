@@ -10,6 +10,7 @@ from models import UserResponse
 from ai_client import client
 from utils.video_utils import extract_frames
 from ocr_utils import get_reader
+from utils.file_manager import ensure_local_file, cleanup_local_file
 
 router = APIRouter(prefix="/api/vdo-ocr", tags=["Video OCR"])
 
@@ -36,8 +37,12 @@ async def extract_text_from_video(
         raise HTTPException(status_code=404, detail="Video not found")
         
     video_path = video.get("file_path")
-    if not video_path or not os.path.exists(video_path):
-        raise HTTPException(status_code=400, detail="Video file not found on disk. Video OCR only works for uploaded files.")
+    if not video_path:
+        raise HTTPException(status_code=400, detail="Video file not found. Video OCR requires a valid uploaded video.")
+
+    local_video_path = await ensure_local_file(video_path)
+    if not os.path.exists(local_video_path):
+        raise HTTPException(status_code=400, detail="Failed to retrieve video file for processing.")
 
     # 1. Create a temporary folder for frames
     job_id = str(uuid.uuid4())
@@ -45,7 +50,7 @@ async def extract_text_from_video(
     
     try:
         # 2. Extract frames (every 10 seconds)
-        frame_paths = extract_frames(video_path, temp_frames_dir, interval=10)
+        frame_paths = extract_frames(local_video_path, temp_frames_dir, interval=10)
         
         if not frame_paths:
             return {"text": "No frames could be extracted from this video.", "video_id": video_id}
@@ -104,3 +109,5 @@ async def extract_text_from_video(
         print(f"Video OCR Error: {e}")
         shutil.rmtree(temp_frames_dir, ignore_errors=True)
         raise HTTPException(status_code=500, detail=f"Video OCR failed: {str(e)}")
+    finally:
+        cleanup_local_file(local_video_path)

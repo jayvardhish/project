@@ -156,3 +156,4 @@ tiktoken
 chromadb
 sentence-transformers
 google-api-python-client
+aiofiles

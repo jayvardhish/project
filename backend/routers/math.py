@@ -11,6 +11,8 @@ from models import UserResponse
 from ai_client import client
 from ocr_utils import get_reader
 from pydantic import BaseModel
+from utils.cloudinary_utils import upload_file_to_cloudinary
+from utils.file_manager import ensure_local_file, cleanup_local_file
 
 router = APIRouter(prefix="/api/math", tags=["Math"])
 
@@ -89,17 +91,21 @@ async def solve_from_image(
         raise HTTPException(status_code=400, detail="Invalid file type. Please upload an image.")
     
     file_id = str(uuid.uuid4())
-    file_ext = os.path.splitext(file.filename)[1]
-    file_path = os.path.join(UPLOAD_DIR, f"{file_id}{file_ext}")
     
-    # 1. Save File
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
+    # Upload to Cloudinary
     try:
+        secure_url = upload_file_to_cloudinary(file, folder="math", resource_type="image")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Cloudinary error: {str(e)}")
+        
+    local_temp_path = None
+    try:
+        # Download temp for local OCR
+        local_temp_path = await ensure_local_file(secure_url)
+        
         # 2. Extract Text via Local OCR
         reader = get_reader()
-        results = reader.readtext(file_path)
+        results = reader.readtext(local_temp_path)
         raw_text = " ".join([res[1] for res in results])
         
         # 3. Refine via AI
@@ -115,7 +121,7 @@ async def solve_from_image(
             "user_id": current_user.id,
             "expression": expression,
             "solution": solution,
-            "image_path": file_path,
+            "image_path": secure_url,
             "type": "image",
             "created_at": datetime.utcnow()
         }
@@ -124,12 +130,16 @@ async def solve_from_image(
         return {
             "id": file_id,
             "expression": expression,
-            "solution": solution
+            "solution": solution,
+            "image_url": secure_url
         }
         
     except Exception as e:
         print(f"Math Image Pipeline Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to process math image.")
+    finally:
+        if local_temp_path:
+            cleanup_local_file(local_temp_path)
 
 @router.post("/solve-text")
 async def solve_from_text(
