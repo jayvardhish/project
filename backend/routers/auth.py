@@ -13,7 +13,7 @@ from datetime import datetime
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 # Use CLIENT_URL (consistent with main.py CORS) or fallback to localhost
-frontend_url = os.getenv("CLIENT_URL") or os.getenv("FRONTEND_URL") or "http://localhost:5173"
+frontend_url = os.getenv("CLIENT_URL") or os.getenv("FRONTEND_URL") or "https://playful-caramel-674bc8.netlify.app"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
@@ -137,14 +137,14 @@ async def reset_password(request: PasswordResetConfirm):
 google_sso = GoogleSSO(
     client_id=os.getenv("GOOGLE_CLIENT_ID") or "dummy",
     client_secret=os.getenv("GOOGLE_CLIENT_SECRET") or "dummy",
-    redirect_uri=os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:5000/api/auth/google/callback"),
+    redirect_uri=os.getenv("GOOGLE_REDIRECT_URI") or "https://smartlearn-backend-143y.onrender.com/api/auth/google/callback",
     allow_insecure_http=True
 )
 
 github_sso = GithubSSO(
     client_id=os.getenv("GITHUB_CLIENT_ID") or "dummy",
     client_secret=os.getenv("GITHUB_CLIENT_SECRET") or "dummy",
-    redirect_uri=os.getenv("GITHUB_REDIRECT_URI", "http://localhost:5000/api/auth/github/callback"),
+    redirect_uri=os.getenv("GITHUB_REDIRECT_URI") or "https://smartlearn-backend-143y.onrender.com/api/auth/github/callback",
     allow_insecure_http=True
 )
 

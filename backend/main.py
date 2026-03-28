@@ -17,6 +17,8 @@ origins = [
     os.getenv("CLIENT_URL", "http://localhost:5173"),
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://playful-caramel-674bc8.netlify.app",
+    "https://smartlearn-frontend.onrender.com"
 ]
 
 # Add production frontend URL if set
