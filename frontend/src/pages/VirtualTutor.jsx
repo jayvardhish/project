@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, User, Bot, Sparkles, Trash2, BookOpen, Calculator, Layers, Brain, Zap, Copy } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const VirtualTutor = () => {
     const [message, setMessage] = useState("");
@@ -19,7 +19,7 @@ const VirtualTutor = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/chat/history`);
+            const response = await api.get('/api/chat/history');
             setChat(response.data);
         } catch (error) {
             console.error("Failed to fetch history:", error);
@@ -35,7 +35,7 @@ const VirtualTutor = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/message`, { message });
+            const response = await api.post('/api/chat/message', { message });
             setChat(prev => [...prev, { role: 'assistant', content: response.data.reply, timestamp: new Date() }]);
         } catch (error) {
             console.error("Chat failed:", error);
@@ -47,7 +47,7 @@ const VirtualTutor = () => {
 
     const clearChat = async () => {
         try {
-            await axios.delete(`${import.meta.env.VITE_API_URL}/api/chat/history`);
+            await api.delete('/api/chat/history');
             setChat([]);
         } catch (error) {
             console.error("Failed to clear chat:", error);

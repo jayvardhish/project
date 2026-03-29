@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, FileText, Upload, Brain, CheckCircle2, XCircle, Info, ArrowRight, Trophy } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const QuizGenerator = () => {
     const [content, setContent] = useState("");
@@ -27,7 +27,7 @@ const QuizGenerator = () => {
         formData.append('num_questions', '5');
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/quizzes/generate`, formData);
+            const response = await api.post('/api/quizzes/generate', formData);
             setQuiz(response.data);
             setCurrentStep(3);
         } catch (error) {

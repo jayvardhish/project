@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, ArrowLeft, Send } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
@@ -17,8 +17,7 @@ const ForgotPassword = () => {
         setError(null);
 
         try {
-            // Placeholder endpoint - will need to implement in backend
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password`, { email });
+            await api.post('/api/auth/forgot-password', { email });
             setMessage("If an account exists with this email, you will receive a reset link shortly.");
         } catch (err) {
             console.error("Forgot password failed:", err);

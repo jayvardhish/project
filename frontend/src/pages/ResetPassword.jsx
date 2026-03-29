@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const ResetPassword = () => {
     const [searchParams] = useSearchParams();
@@ -28,7 +28,7 @@ const ResetPassword = () => {
         setError(null);
 
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/reset-password`, {
+            await api.post('/api/auth/reset-password', {
                 token,
                 new_password: password
             });

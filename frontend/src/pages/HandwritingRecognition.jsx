@@ -5,7 +5,7 @@ import {
     Image as ImageIcon, Zap, History, X,
     Trash2, RefreshCw, Layers, ExternalLink, ScrollText
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const HandwritingRecognition = () => {
     const [file, setFile] = useState(null);
@@ -21,7 +21,7 @@ const HandwritingRecognition = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/ocr/history`);
+            const response = await api.get('/api/ocr/history');
             setHistory(response.data);
             if (response.data.length > 0 && !selectedItem) {
                 setSelectedItem(response.data[0]);
@@ -47,7 +47,7 @@ const HandwritingRecognition = () => {
         formData.append('mode', 'default');
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/ocr/upload`, formData);
+            const response = await api.post('/api/ocr/upload', formData);
             const newItem = {
                 _id: response.data.id,
                 title: file.name,
@@ -68,7 +68,7 @@ const HandwritingRecognition = () => {
 
     const deleteItem = async (id) => {
         try {
-            await axios.delete(`${import.meta.env.VITE_API_URL}/api/ocr/${id}`);
+            await api.delete(`/api/ocr/${id}`);
             const newHistory = history.filter(item => item._id !== id);
             setHistory(newHistory);
             if (selectedItem?._id === id) {

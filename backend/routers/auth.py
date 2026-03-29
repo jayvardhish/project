@@ -12,8 +12,11 @@ from database import get_database
 from datetime import datetime
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
-# Use CLIENT_URL (consistent with main.py CORS) or fallback to localhost
-frontend_url = os.getenv("CLIENT_URL") or os.getenv("FRONTEND_URL") or "https://playful-caramel-674bc8.netlify.app"
+# Use both common variations for Render (with and without hyphens)
+frontend_url = os.getenv("CLIENT_URL") or os.getenv("FRONTEND_URL") or "https://smart-learning-frontend.onrender.com"
+# Fallback to Netlify if Render isn't the primary
+if not os.getenv("CLIENT_URL") and not os.getenv("FRONTEND_URL"):
+    frontend_url = "https://playful-caramel-674bc8.netlify.app"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
@@ -134,22 +137,25 @@ async def reset_password(request: PasswordResetConfirm):
     return {"message": "Password reset successful"}
 
 # OAuth Configuration
+backend_url = os.getenv("BACKEND_URL") or os.getenv("RENDER_EXTERNAL_URL") or "https://smart-learning-backend.onrender.com"
+
 google_sso = GoogleSSO(
     client_id=os.getenv("GOOGLE_CLIENT_ID") or "dummy",
     client_secret=os.getenv("GOOGLE_CLIENT_SECRET") or "dummy",
-    redirect_uri=os.getenv("GOOGLE_REDIRECT_URI") or "https://smartlearn-backend-143y.onrender.com/api/auth/google/callback",
+    redirect_uri=os.getenv("GOOGLE_REDIRECT_URI") or f"{backend_url}/api/auth/google/callback",
     allow_insecure_http=True
 )
 
 github_sso = GithubSSO(
     client_id=os.getenv("GITHUB_CLIENT_ID") or "dummy",
     client_secret=os.getenv("GITHUB_CLIENT_SECRET") or "dummy",
-    redirect_uri=os.getenv("GITHUB_REDIRECT_URI") or "https://smartlearn-backend-143y.onrender.com/api/auth/github/callback",
+    redirect_uri=os.getenv("GITHUB_REDIRECT_URI") or f"{backend_url}/api/auth/github/callback",
     allow_insecure_http=True
 )
 
 @router.get("/google/login")
 async def google_login():
+    print(f"DEBUG: Starting Google Login redirect_uri: {google_sso.redirect_uri}")
     return await google_sso.get_login_redirect()
 
 @router.get("/google/callback")
@@ -173,7 +179,9 @@ async def google_callback(request: Request):
         
         access_token = create_access_token(data={"sub": user.email})
         # Redirect to frontend with token
-        return RedirectResponse(url=f"{frontend_url}/dashboard?token={access_token}")
+        target_url = f"{frontend_url}/dashboard?token={access_token}"
+        print(f"DEBUG: Google Auth Success. Redirecting back to: {target_url}")
+        return RedirectResponse(url=target_url)
     except Exception as e:
         print(f"Google Auth Error: {e}")
         # Return detailed error for debugging

@@ -5,7 +5,7 @@ import { User, Mail, Lock, UserPlus, Chrome, Zap } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import axios from 'axios';
+import api, { API_URL } from '../utils/api';
 
 const schema = z.object({
     username: z.string().min(3, { message: "Username must be at least 3 characters" }),
@@ -21,7 +21,7 @@ const Signup = () => {
 
     const onSubmit = async (data) => {
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/signup`, data);
+            await api.post('/api/auth/signup', data);
             alert("Account created successfully! Please log in.");
             navigate('/login');
         } catch (error) {
@@ -163,7 +163,7 @@ const Signup = () => {
 
                     <div className="mt-8">
                         <a
-                            href={`${import.meta.env.VITE_API_URL}/api/auth/google/login`}
+                            href={`${API_URL}/api/auth/google/login`}
                             className="flex items-center justify-center w-full py-4 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 hover:shadow-xl transition-all font-bold text-gray-700 shadow-md"
                         >
                             <img src="https://www.google.com/favicon.ico" className="w-5 h-5 mr-3" alt="Google" /> Sign up with Google

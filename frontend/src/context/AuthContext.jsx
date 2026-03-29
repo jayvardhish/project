@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const AuthContext = createContext();
 
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         console.log("AuthContext: Checking token...", { hasToken: !!token });
         if (token) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            // No need to set headers.common, the api interceptor handles it
             fetchCurrentUser();
         } else {
             console.log("AuthContext: No token, unlocking loading");
@@ -51,9 +51,8 @@ export const AuthProvider = ({ children }) => {
 
     const fetchCurrentUser = async () => {
         try {
-            const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/me`;
-            console.log("AuthContext: Fetching from:", apiUrl);
-            const response = await axios.get(apiUrl, { timeout: 8000 });
+            console.log("AuthContext: Fetching from: /api/auth/me");
+            const response = await api.get('/api/auth/me', { timeout: 8000 });
             setUser(response.data);
             console.log("AuthContext: User verified");
         } catch (error) {
@@ -69,14 +68,14 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', newToken);
         setToken(newToken);
         setUser(userData);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+        // No need to set headers.common, the api interceptor handles it
     };
 
     const logout = () => {
         localStorage.removeItem('token');
         setToken(null);
         setUser(null);
-        delete axios.defaults.headers.common['Authorization'];
+        // No need to delete headers.common
     };
 
     const value = {

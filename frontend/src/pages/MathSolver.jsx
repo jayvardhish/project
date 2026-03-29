@@ -5,7 +5,7 @@ import {
     FileText, CheckCircle2, ChevronRight, Download, Copy,
     Trash2, Lightbulb, History, Send, X, Terminal, Brain
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -26,7 +26,7 @@ const MathSolver = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/math/history`);
+            const response = await api.get('/api/math/history');
             setHistory(response.data);
             if (response.data.length > 0 && !selectedItem) {
                 setSelectedItem(response.data[0]);
@@ -49,7 +49,7 @@ const MathSolver = () => {
         if (!expression.trim()) return;
         setLoading(true);
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/math/solve-text`, { expression });
+            const response = await api.post('/api/math/solve-text', { expression });
             const newItem = {
                 _id: response.data.id,
                 expression,
@@ -73,7 +73,7 @@ const MathSolver = () => {
         const formData = new FormData();
         formData.append('file', file);
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/math/solve`, formData);
+            const response = await api.post('/api/math/solve', formData);
             const newItem = {
                 _id: response.data.id,
                 expression: response.data.expression,
@@ -94,7 +94,7 @@ const MathSolver = () => {
 
     const deleteItem = async (id) => {
         try {
-            await axios.delete(`${import.meta.env.VITE_API_URL}/api/math/${id}`);
+            await api.delete(`/api/math/${id}`);
             const newHistory = history.filter(item => item._id !== id);
             setHistory(newHistory);
             if (selectedItem?._id === id) {

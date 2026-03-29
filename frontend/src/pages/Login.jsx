@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api, { API_URL } from '../utils/api';
 
 const schema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -22,18 +22,31 @@ const Login = () => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, data);
+            const response = await api.post('/api/auth/login', data);
             const { access_token } = response.data;
 
-            const userRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
+            const userRes = await api.get('/api/auth/me', {
                 headers: { Authorization: `Bearer ${access_token}` }
             });
 
             login(access_token, userRes.data);
             navigate('/dashboard');
         } catch (error) {
-            console.error("Login failed:", error);
-            alert(error.response?.data?.detail || "Login failed. Please check your credentials.");
+            console.error("Login failed context:", {
+                apiUrl: API_URL,
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
+            
+            let errorMessage = "Login failed. Please check your connection.";
+            if (error.response) {
+                errorMessage = error.response.data?.detail || `Server Error: ${error.response.status}`;
+            } else if (error.request) {
+                errorMessage = "No response from server. This could be a CORS issue or the backend being down.";
+            }
+            
+            alert(errorMessage);
         }
     };
 
@@ -158,7 +171,7 @@ const Login = () => {
 
                     <div className="mt-10">
                         <a
-                            href={`${import.meta.env.VITE_API_URL}/api/auth/google/login`}
+                            href={`${API_URL}/api/auth/google/login`}
                             className="flex items-center justify-center w-full py-4 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 hover:shadow-xl transition-all font-bold text-gray-700 shadow-md"
                         >
                             <img src="https://www.google.com/favicon.ico" className="w-5 h-5 mr-3" alt="Google" /> Continue with Google

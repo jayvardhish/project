@@ -5,7 +5,7 @@ import {
     Layers, Youtube, FileText, ChevronRight, AlertCircle,
     Loader2, Trash2, ExternalLink, Copy, Check, Zap, Video
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const VideoSummarizer = () => {
     const [ytUrl, setYtUrl] = useState('');
@@ -22,7 +22,7 @@ const VideoSummarizer = () => {
 
     const fetchVideos = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/videos/`);
+            const response = await api.get('/api/videos/');
             setVideos(response.data);
             if (response.data.length > 0 && !selectedVideo) {
                 setSelectedVideo(response.data[0]);
@@ -38,7 +38,7 @@ const VideoSummarizer = () => {
         try {
             const formData = new FormData();
             formData.append('url', ytUrl);
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/videos/youtube`, formData);
+            const response = await api.post('/api/videos/youtube', formData);
             setSelectedVideo(response.data);
             setActiveTab('study_notes');
             setYtUrl('');
@@ -54,7 +54,7 @@ const VideoSummarizer = () => {
         if (!selectedVideo || generatingNotes) return;
         setGeneratingNotes(true);
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/videos/${selectedVideo._id}/study-notes`);
+            const response = await api.post(`/api/videos/${selectedVideo._id}/study-notes`);
             const updatedVideo = { ...selectedVideo, study_notes: response.data };
             setSelectedVideo(updatedVideo);
             setVideos(videos.map(v => v._id === selectedVideo._id ? updatedVideo : v));
@@ -76,7 +76,7 @@ const VideoSummarizer = () => {
     const handleClearHistory = async () => {
         if (!window.confirm("Are you sure you want to clear all video history? This cannot be undone.")) return;
         try {
-            await axios.delete(`${import.meta.env.VITE_API_URL}/api/videos/clear`);
+            await api.delete('/api/videos/clear');
             setVideos([]);
             setSelectedVideo(null);
         } catch (error) {
@@ -86,7 +86,7 @@ const VideoSummarizer = () => {
 
     const handleDeleteVideo = async (videoId) => {
         try {
-            await axios.delete(`${import.meta.env.VITE_API_URL}/api/videos/${videoId}`);
+            await api.delete(`/api/videos/${videoId}`);
             const remaining = videos.filter(v => v._id !== videoId);
             setVideos(remaining);
             if (selectedVideo?._id === videoId) {
@@ -100,8 +100,8 @@ const VideoSummarizer = () => {
     const handleDownloadPDF = async () => {
         if (!selectedVideo) return;
         try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/videos/${selectedVideo._id}/pdf`,
+            const response = await api.get(
+                `/api/videos/${selectedVideo._id}/pdf`,
                 { responseType: 'blob' }
             );
             const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -119,8 +119,8 @@ const VideoSummarizer = () => {
     const handleDownloadLatex = async () => {
         if (!selectedVideo) return;
         try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/videos/${selectedVideo._id}/latex`,
+            const response = await api.get(
+                `/api/videos/${selectedVideo._id}/latex`,
                 { responseType: 'blob' }
             );
             const url = window.URL.createObjectURL(new Blob([response.data]));

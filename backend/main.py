@@ -18,13 +18,19 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://playful-caramel-674bc8.netlify.app",
-    "https://smartlearn-frontend.onrender.com"
+    "https://smartlearn-frontend.onrender.com",
+    "https://smart-learning-frontend.onrender.com",     # Hyphenated version from render.yaml
+    "https://smart-learning-platform.onrender.com",     # Common variation
 ]
 
-# Add production frontend URL if set
+# Add production URLs from env if set
 production_url = os.getenv("PRODUCTION_CLIENT_URL")
 if production_url:
     origins.append(production_url)
+
+frontend_url_env = os.getenv("FRONTEND_URL")
+if frontend_url_env and frontend_url_env not in origins:
+    origins.append(frontend_url_env)
 
 app.add_middleware(
     CORSMiddleware,

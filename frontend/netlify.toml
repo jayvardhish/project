@@ -4,7 +4,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://smartlearn-backend-143y.onrender.com/api/:splat"
+  to = "https://project-132g.onrender.com/api/:splat"
   status = 200
   force = true
 
